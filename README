@@ -1,0 +1,25 @@
+=== BUILDING ===
+This project uses 'gb', a go build system.
+
+To build this project, type:  gb
+
+To clean, type:  gb -c
+
+=== TESTING ===
+There are two test programs.  One uses the command-line client,
+which is built as bin/client.
+
+To use this one, run ./testme.sh
+It runs a basic set of tests and assumes that your program
+is running on port 9009.  It's kind of fragile for now.
+
+The tests in server/server_test.go are more robust, but
+we're still in the process of adding more tests to them.
+Please check the announcements for updates to the tests.
+
+To run the server tests:  gb -t
+
+
+=== HANDING IN ===
+Please remember to clean your directory before handing it in,
+and remove server.log
