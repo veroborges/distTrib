@@ -60,8 +60,8 @@ func (ts *Tribserver) RemoveFromList(key string, value string){
 
 }
 
-func NewServMap() *ServMap {
-	return &ServMap {
+func NewTribMap() *TribMap {
+	return &TribMap {
 		data: make(map [string] string)
 	}
 } 
