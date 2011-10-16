@@ -13,6 +13,11 @@ type Tribble struct {
 	Contents string
 }
 
+func (t *Tribble) Less(y interface{}) bool {
+	return t.Posted < y.(*Tribble).Posted
+}
+
+
 type CreateUserArgs struct {
 	Userid string
 }

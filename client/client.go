@@ -24,7 +24,7 @@ const (
 )
 
 var portnum *int = flag.Int("port", 9009, "server port # to connect to")
-
+var host *string = flag.String("host", "localhost", "server hostname")
 
 func main() {
 
@@ -35,7 +35,7 @@ func main() {
 
 	cmd := flag.Arg(0)
 	
-	serverAddress := "localhost"
+	serverAddress := *host
 	serverPort := fmt.Sprintf("%d", *portnum)
 	client, _ := tribbleclient.NewTribbleclient(serverAddress, serverPort)
 

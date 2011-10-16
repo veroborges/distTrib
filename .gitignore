@@ -1,2 +1,5 @@
 *.swp
 *.log
+_obj
+bin
+_go_.6
