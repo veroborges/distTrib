@@ -41,7 +41,6 @@ func (ts *Tribserver) CreateUser(args *tribproto.CreateUserArgs, reply *tribprot
 			ts.tm.PUT(args.Userid + LAST, val)
 			val, _ = json.Marshal(make(map[string] bool))
 			ts.tm.PUT(args.Userid + SUBSCRIPTIONS, val)
-			//ts.tm.PUT(args.UserID + ":tribbles", json.Marshal(make (map [int] bool)) 
 	}
 	return nil
 }
