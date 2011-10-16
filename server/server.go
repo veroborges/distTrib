@@ -36,7 +36,7 @@ func (ts *Tribserver) CreateUser(args *tribproto.CreateUserArgs, reply *tribprot
 	
 	}else {
 			//initialize the 3 maps for the user
-			PUT(args.UserID + ":last", json.Marshal(0))
+			PUT(args.UserID + ":last", json.Marshal(new(int)))
 			PUT(args.UserID + ":subscribers", json.Marshal(make (map [string] bool))
 			PUT(args.UserID + ":tribbles", json.Marshal(make (map [int] bool)) 
 	}
