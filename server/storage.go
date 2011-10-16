@@ -16,7 +16,7 @@ func NewTribMap() *TribMap {
 	return tm
 }
 
-func (tm *TribMap) GET(key string) ([]byte, bool) { 
+func (tm *TribMap) GET(key string) ([]byte, bool) {
 	tm.lock.RLock()
 	defer tm.lock.RUnlock()
 	val, ok := tm.data[key]
@@ -33,34 +33,44 @@ func (tm *TribMap) PUT(key string, val []byte) (bool) {
 func (tm *TribMap) AddToList(key string, element []byte) (os.Error) {
 	tm.lock.Lock()
 	defer tm.lock.Unlock()
-	list, err := tm.getMap(key)
+	set, err := tm.getSet(key)
 	if (err != nil) {
 		return err
 	}
-	list[string(element)] = true
+	set[string(element)] = true
+	val, err := json.Marshal(set)
+	if (err != nil) {
+		return err
+	}
+	tm.data[key] = val
 	return nil
 }
 
 func (tm *TribMap) RemoveFromList(key string, element []byte) (os.Error) {
 	tm.lock.Lock()
 	defer tm.lock.Unlock()
-	list, err := tm.getMap(key)
+	set, err := tm.getSet(key)
 	if (err != nil) {
 		return err
 	}
-	list[string(element)] = false, false
+	set[string(element)] = false, false
+	val, err := json.Marshal(set)
+	if (err != nil) {
+		return err
+	}
+	tm.data[key] = val
 	return nil
 }
 
-func (tm *TribMap) getMap(key string) (map[string] bool, os.Error) {
+func (tm *TribMap) getSet(key string) (map[string] bool, os.Error) {
 	val, ok := tm.data[key]
 	if (!ok) {
 		return nil, os.NewError("Non-existing key")
 	}
-	list := make(map[string] bool);
-	err := json.Unmarshal(val, list)
+	set := make(map[string] bool);
+	err := json.Unmarshal(val, set)
 	if (err != nil) {
 		return nil, err
 	}
-	return list, nil
+	return set, nil
 }
