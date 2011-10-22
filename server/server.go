@@ -125,7 +125,11 @@ func (ts *Tribserver) PostTribble(args *tribproto.PostTribbleArgs, reply *tribpr
 }
 
 func (ts *Tribserver) GetTribbles(args *tribproto.GetTribblesArgs, reply *tribproto.GetTribblesReply) os.Error {
-	if lastJson, stat := ts.tm.GET(args.Userid + LAST); stat == storageproto.EITEMEXISTS{
+	lastJson, stat, err := ts.tm.GET(args.Userid + LAST)
+	if err != nil {
+		return err
+	}
+	if stat == storageproto.EITEMEXISTS{
 		last := new(int)
 		err := json.Unmarshal(lastJson, last)
 		if (err != nil) {
@@ -138,7 +142,11 @@ func (ts *Tribserver) GetTribbles(args *tribproto.GetTribblesArgs, reply *tribpr
 		reply.Tribbles = make([]tribproto.Tribble, size)
 		for i := 0; i < size; i++ {
 			tribbleId := fmt.Sprintf("%s:%d", args.Userid, *last)
-			if tribJson, stat := ts.tm.GET(tribbleId); stat == storageproto.EITEMEXISTS {
+			tribJson, stat, err := ts.tm.GET(tribbleId)
+			if err != nil{
+				return err
+			}
+			if stat == storageproto.EITEMEXISTS {
 				trib := new(tribproto.Tribble)
 				err := json.Unmarshal(tribJson, trib)
 				if (err != nil) {
@@ -155,7 +163,11 @@ func (ts *Tribserver) GetTribbles(args *tribproto.GetTribblesArgs, reply *tribpr
 }
 
 func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs, reply *tribproto.GetTribblesReply) os.Error {
-	if suscribJson, stat := ts.tm.GET(args.Userid + SUBSCRIPTIONS); stat == storageproto.EITEMEXISTS{
+	suscribJson, stat, err := ts.tm.GET(args.Userid + SUBSCRIPTIONS)
+	if err != nil {
+		return err
+	}
+	if stat == storageproto.EITEMEXISTS{
 		suscribers := make(map [string] bool)
 		json.Unmarshal(suscribJson, &suscribers)
 		recentTribs := vector.Vector(make([]interface{},0, 100))
@@ -167,7 +179,10 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 			hasTribs = false
 			for subscriber, _ := range suscribers  {
 				log.Printf("get r %s", subscriber + LAST)
-				lastJson, _ := ts.tm.GET(subscriber + LAST)
+				lastJson, _, err := ts.tm.GET(subscriber + LAST)
+				if err != nil{
+					return err
+				}
 				log.Printf("last %s", string(lastJson))
 				last := new(int)
 				err := json.Unmarshal(lastJson, last)
@@ -179,7 +194,11 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 				log.Printf("%s", tribbleId)
 				if (*last > 0) {
 					hasTribs = true
-					if tribJson, stat := ts.tm.GET(tribbleId); stat == storageproto.EITEMEXISTS {
+					tribJson, stat, err := ts.tm.GET(tribbleId)
+					if err != nil {
+						return err
+					}
+					if stat == storageproto.EITEMEXISTS {
 						log.Printf("%s %s", tribbleId, tribJson)
 						trib := new(tribproto.Tribble)
 						err = json.Unmarshal(tribJson, trib)
