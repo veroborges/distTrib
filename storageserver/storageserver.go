@@ -4,16 +4,38 @@ import (
 	"storageproto"
 	"hash/fnv"
 	"strings"
+	"rpc"
+	"storage"
+	"storagerpc"
+	"os"
+	"time"
 )
 
 type Storageserver struct {
+	tm *TribMap
+	servers []*serverData
+	numnodes int
+}
+
+type serverData {
+	server *rpc.Client
+	nodeid uint32
 }
 
 func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *Storageserver {
-	if (numnodes > 0) {
-		// I'm the master!  That's exciting!
+	ss := &Storageserver{storage.NewTribMap(), make([]*rpc.Client, 0, 0), numnodes}
+	if (numnodes == 0) {
+		for {
+			master, err := rpc.DialHTTP("tcp", net.JoinHostPort(master, portnum))
+			if err != nil {
+				log.Info("Failed to connect to the master; retrying")
+				time.Sleep(1000000000)
+			} else {
+				reply := new(storageproto.RegisterReply)
+				master.Call("StorageRPC.Register", 
+			}
+		}
 	}
-	ss := &Storageserver{}
 	return ss
 }
 
@@ -50,9 +72,6 @@ func (ss *Storageserver) RemoveFromListRPC(args *storageproto.PutArgs, reply *st
 	return nil
 }
 
-
-
-//assume list of storageservers is called servers
 
 
 func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
