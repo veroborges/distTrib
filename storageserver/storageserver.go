@@ -207,7 +207,7 @@ func (ss *Storageserver) AddToList(key string, element []byte) (int, os.Error) {
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeid {
-		return ss.tm.AddToList(key, element), nil      
+		return ss.tm.AddToList(key, element)     
 	
 	}else{
 		//if not, call correct server via rpc
@@ -229,7 +229,7 @@ func (ss *Storageserver) RemoveFromList(key string, element []byte) (int, os.Err
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeid {
-		return ss.tm.RemoveFromList(key, element), nil      
+		return ss.tm.RemoveFromList(key, element)    
 	
 	}else{
 		//if not, call correct server via rpc
