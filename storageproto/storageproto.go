@@ -6,6 +6,7 @@ const (
 	EKEYNOTFOUND
 	EITEMNOTFOUND // lists
 	EPUTFAILED
+	EITEMEXISTS
 )
 
 type GetArgs struct {

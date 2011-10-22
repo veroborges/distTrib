@@ -98,26 +98,62 @@ func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *sto
 }
 
 func (ss *Storageserver) GetRPC(args *storageproto.GetArgs, reply *storageproto.GetReply) os.Error {
+	val, ok := ss.tm.GET(args.Key)
+	if (!ok) {
+		reply.Status = storageproto.EKEYNOTFOUND
+	} else {
+		reply.Status = storageproto.OK
+		reply.Value = string(val)
+	}
 	return nil
 }
 
 func (ss *Storageserver) GetListRPC(args *storageproto.GetArgs, reply *storageproto.GetListReply) os.Error {
+	val, ok := ss.tm.GET(args.Key)
+	if (!ok) {
+		reply.Status = storageproto.EKEYNOTFOUND
+	} else {
+		set := make(map[string] bool)
+		err := json.Unmarshal(val, &set)
+		if (err != nil) {
+			reply.Status = EKEYNOTFOUND
+		} else {
+			reply.Value = make([]string, len(set))
+			i:=0
+			for k, _ = range set {
+				reply.Value[i]=k
+				i++
+			}
+			reply.Status = OK
+		}
+
+	}
 	return nil
 }
 
 func (ss *Storageserver) PutRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
-	return nil
+	ss.tm.PUT(args.Key, []byte(args.Value))
+	reply.Status = storageproto.OK
 }
 
 func (ss *Storageserver) AppendToListRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
+	err := ss.tm.AddToList(args.Key, byte[](args.Value))
+	if (err == nil) {
+		reply.Status = storageproto.OK
+	} else {
+		reply.Status = storageproto.EPUTFAILED
+	}
 	return nil
 }
 
 func (ss *Storageserver) RemoveFromListRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
-	return nil
+	err, ok := ss.tm.RemoveFromList(args.Key, byte[](args.Value))
+	if (err != nil || !ok) {
+		reply.Status = storageproto.EITEMNOTFOUND
+	} else {
+		reply.Status = storageproto.OK
+	}
 }
-
-
 
 func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
   index := ss.GetIndex(key)
@@ -132,13 +168,11 @@ func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
 		args := &storageproto.GetArgs{key}
 		var reply tribproto.GetReply
 
-	 	err := serv.server.Call("StorageRPC.Get", args, &reply)
-		
+		err := serv.server.Call("StorageRPC.Get", args, &reply)
 		if (err != nil) {
 				return nil, 0, err //is this the correct status for when err?
 		}
-			
-		return []byte(reply.Value), reply.Status, nil	
+		return []byte(reply.Value), reply.Status, nil
 	  }
 }
 
@@ -148,19 +182,15 @@ func (ss *Storageserver) PUT(key string, val []byte) (bool, os.Error) {
 
 	//if local server call server tribmap
 	if serv.nodeid == ss.nodeid {
-		return ss.tm.PUT(key, val), nil      
-	
+		return ss.tm.PUT(key, val), nil
 	}else{
 		//if not, call correct server via rpc
 		args := &storageproto.PutArgs{key, string(val)}
 		var reply tribproto.PutReply
-		
 		err := serv.server.Call("StorageRPC.Put", args, &reply)
-		
 		if (err != nil) {
 		  return 0, err
 	  }
-	  
 		return reply.Status, nil
 	}
 }
@@ -171,19 +201,15 @@ func (ss *Storageserver) AddToList(key string, element []byte) (bool, os.Error) 
 
 	//if local server call server tribmap
 	if serv.nodeid == ss.nodeid {
-		return ss.tm.AddToList(key, element), nil      
-	
+		return ss.tm.AddToList(key, element), nil
 	}else{
 		//if not, call correct server via rpc
 		args := &storageproto.PutArgs{key, string(element)}
 		var reply tribproto.PutReply
-	
 		err := serv.server.Call("StorageRPC.AppendToList", args, &reply)
-		
 		if (err != nil) {
 		  return 0, err
 	  }
-	  
 		return reply.Status, nil
 	}
 }
@@ -194,29 +220,26 @@ func (ss *Storageserver) RemoveFromList(key string, element []byte) (bool, os.Er
 
 	//if local server call server tribmap
 	if serv.nodeid == ss.nodeid {
-		return ss.tm.RemoveFromList(key, element), nil      
-	
+		return ss.tm.RemoveFromList(key, element), nil
 	}else{
 		//if not, call correct server via rpc
 		args := &storageproto.PutArgs{key, string(value)}
 		var reply tribproto.PutReply
 
 		err := serv.server.Call("StorageRPC.RemoveFromList", args, &reply)
-		
 		if (err != nil) {
 		  return 0, err
 	  }
-	  
 		return reply.Status, nil
 	}
 }
 
 func (ss *Storageserver) GetIndex(key string) (int) {
 	fields := strings.Split(key, ":")
-	user := fields[0]			
- 	h = New32()
+	user := fields[0]
+	h = New32()
 	h.Write([]byte(user))
-	
+
 	return (h.Sum32() % len(servers)) - 1
 }
 

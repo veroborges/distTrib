@@ -4,7 +4,7 @@ import (
 	"sync"
 	"os"
 	"json"
-	"log"
+	"storageproto"
 )
 
 type TribMap struct {
@@ -17,71 +17,84 @@ func NewTribMap() *TribMap {
 	return tm
 }
 
-func (tm *TribMap) GET(key string) ([]byte, bool) {
+func (tm *TribMap) GET(key string) ([]byte, int) {
 	tm.lock.RLock()
 	defer tm.lock.RUnlock()
 	val, ok := tm.data[key]
-	return val, ok
+	if (!ok) {
+		return nil, storageproto.EKEYNOTFOUND
+	}
+	return val, storageproto.OK
 }
 
-func (tm *TribMap) PUT(key string, val []byte) (bool) {
+func (tm *TribMap) PUT(key string, val []byte) (int) {
 	tm.lock.Lock()
 	defer tm.lock.Unlock()
 	tm.data[key] = val
-	log.Printf("Adding %s to %s", string(val), key)
-	return true
+	return  storageproto.OK
 }
 
-func (tm *TribMap) AddToList(key string, element []byte) (os.Error) {
+func (tm *TribMap) AddToList(key string, element []byte) (os.Error, int) {
 	tm.lock.Lock()
 	defer tm.lock.Unlock()
-	set, err := tm.getSet(key)
+	_, ok := tm.data[key]
+	if (!ok) {
+		return nil, storageproto.EKEYNOTFOUND
+	}
+	set, err := tm.GetSet(key)
 	if (err != nil) {
-		return err
+		return err, storageproto.EPUTFAILED
 	}
 	s := new(string)
 	err = json.Unmarshal(element, s)
 	if (err != nil) {
-		return err
+		return err, storageproto.EPUTFAILED
+	}
+	_, ok = set[*s]
+	if (ok) {
+		return nil, storageproto.EITEMEXISTS
 	}
 	set[*s] = true
 	val, err := json.Marshal(set)
-	log.Printf("%s %s", key, string(tm.data[key]))
 	if (err != nil) {
-		return err
+		return err, storageproto.EPUTFAILED
 	}
 	tm.data[key] = val
-	return nil
+	return nil, storageproto.OK
 }
 
-func (tm *TribMap) RemoveFromList(key string, element []byte) (os.Error) {
+func (tm *TribMap) RemoveFromList(key string, element []byte) (os.Error, int) {
 	tm.lock.Lock()
 	defer tm.lock.Unlock()
-	set, err := tm.getSet(key)
+	_, ok := tm.data[key]
+	if (!ok) {
+                return nil, storageproto.EKEYNOTFOUND
+        }
+	set, err := tm.GetSet(key)
 	if (err != nil) {
-		return err
+		return err, storageproto.EPUTFAILED
 	}
 	s := new(string)
         err = json.Unmarshal(element, s)
         if (err != nil) {
-                return err
+                return err, storageproto.EPUTFAILED
         }
+	_, ok = set[*s]
+	if (!ok) {
+		return nil, storageproto.EITEMNOTFOUND
+	}
         set[*s] = false, false
 	val, err := json.Marshal(set)
 	if (err != nil) {
-		return err
+		return err, storageproto.EPUTFAILED
 	}
 	tm.data[key] = val
-	return nil
+	return nil, storageproto.OK
 }
 
-func (tm *TribMap) getSet(key string) (map[string] bool, os.Error) {
-	val, ok := tm.data[key]
-	if (!ok) {
-		return nil, os.NewError("Non-existing key")
-	}
+func (tm *TribMap) GetSet(key string) (map[string] bool, os.Error) {
 	set := make(map[string] bool)
-	err := json.Unmarshal(val, &set)
+	err := json.Unmarshal(tm.data[key], &set)
 	if (err != nil) {
 		return nil, err
 	}
