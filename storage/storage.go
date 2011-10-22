@@ -34,62 +34,62 @@ func (tm *TribMap) PUT(key string, val []byte) (int) {
 	return  storageproto.OK
 }
 
-func (tm *TribMap) AddToList(key string, element []byte) (os.Error, int) {
+func (tm *TribMap) AddToList(key string, element []byte) (int, os.Error) {
 	tm.lock.Lock()
 	defer tm.lock.Unlock()
 	_, ok := tm.data[key]
 	if (!ok) {
-		return nil, storageproto.EKEYNOTFOUND
+		return storageproto.EKEYNOTFOUND, nil
 	}
 	set, err := tm.GetSet(key)
 	if (err != nil) {
-		return err, storageproto.EPUTFAILED
+		return storageproto.EPUTFAILED, err
 	}
 	s := new(string)
 	err = json.Unmarshal(element, s)
 	if (err != nil) {
-		return err, storageproto.EPUTFAILED
+		return storageproto.EPUTFAILED, err
 	}
 	_, ok = set[*s]
 	if (ok) {
-		return nil, storageproto.EITEMEXISTS
+		return storageproto.EITEMEXISTS, err
 	}
 	set[*s] = true
 	val, err := json.Marshal(set)
 	if (err != nil) {
-		return err, storageproto.EPUTFAILED
+		return storageproto.EPUTFAILED, err
 	}
 	tm.data[key] = val
-	return nil, storageproto.OK
+	return storageproto.OK, nil
 }
 
-func (tm *TribMap) RemoveFromList(key string, element []byte) (os.Error, int) {
+func (tm *TribMap) RemoveFromList(key string, element []byte) (int, os.Error) {
 	tm.lock.Lock()
 	defer tm.lock.Unlock()
 	_, ok := tm.data[key]
 	if (!ok) {
-                return nil, storageproto.EKEYNOTFOUND
+                return storageproto.EKEYNOTFOUND, nil
         }
 	set, err := tm.GetSet(key)
 	if (err != nil) {
-		return err, storageproto.EPUTFAILED
+		return storageproto.EPUTFAILED, err
 	}
 	s := new(string)
         err = json.Unmarshal(element, s)
         if (err != nil) {
-                return err, storageproto.EPUTFAILED
+                return storageproto.EPUTFAILED, err
         }
 	_, ok = set[*s]
 	if (!ok) {
-		return nil, storageproto.EITEMNOTFOUND
+		return storageproto.EITEMNOTFOUND, err
 	}
         set[*s] = false, false
 	val, err := json.Marshal(set)
 	if (err != nil) {
-		return err, storageproto.EPUTFAILED
+		return storageproto.EPUTFAILED, err
 	}
 	tm.data[key] = val
-	return nil, storageproto.OK
+	return storageproto.OK, nil
 }
 
 func (tm *TribMap) GetSet(key string) (map[string] bool, os.Error) {
