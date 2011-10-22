@@ -2,16 +2,38 @@ package storageserver
 
 import (
 	"storageproto"
+	"rpc"
+	"storage"
+	"storagerpc"
+	"os"
+	"time"
 )
 
 type Storageserver struct {
+	tm *TribMap
+	servers []*serverData
+	numnodes int
+}
+
+type serverData {
+	server *rpc.Client
+	nodeid uint32
 }
 
 func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *Storageserver {
-	if (numnodes > 0) {
-		// I'm the master!  That's exciting!
+	ss := &Storageserver{storage.NewTribMap(), make([]*rpc.Client, 0, 0), numnodes}
+	if (numnodes == 0) {
+		for {
+			master, err := rpc.DialHTTP("tcp", net.JoinHostPort(master, portnum))
+			if err != nil {
+				log.Info("Failed to connect to the master; retrying")
+				time.Sleep(1000000000)
+			} else {
+				reply := new(storageproto.RegisterReply)
+				master.Call("StorageRPC.Register", 
+			}
+		}
 	}
-	ss := &Storageserver{}
 	return ss
 }
 
@@ -49,27 +71,14 @@ func (ss *Storageserver) RemoveFromListRPC(args *storageproto.PutArgs, reply *st
 }
 
 
-
-
-type TribMap struct {
-	data map[string] []byte
-	lock sync.RWMutex
+func (ss *Storageserver) GET(key string) ([]byte, bool) {
 }
 
-func NewTribMap() *TribMap {
+func (ss *StorageServer) PUT(key string, val []byte) (bool) {
 }
 
-func (tm *TribMap) GET(key string) ([]byte, bool) {
+func (ss *StorageServer) AddToList(key string, element []byte) (os.Error) {
 }
 
-func (tm *TribMap) PUT(key string, val []byte) (bool) {
-}
-
-func (tm *TribMap) AddToList(key string, element []byte) (os.Error) {
-}
-
-func (tm *TribMap) RemoveFromList(key string, element []byte) (os.Error) {
-}
-
-func (tm *TribMap) getSet(key string) (map[string] bool, os.Error) {
+func (ss *StorageServer) RemoveFromList(key string, element []byte) (os.Error) {
 }
