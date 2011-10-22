@@ -9,12 +9,12 @@ import (
 	"fmt"
 	"tribproto"
 	"flag"
- 	"json"
+	"json"
 	"time"
-	"storage"
 	"container/vector"
 	"container/heap"
-  "storageproto"
+	"storageproto"
+	"storageserver"
 )
 
 const SUBSCRIPTIONS string = ":subscriptions"
@@ -22,9 +22,13 @@ const LAST string = ":last"
 
 func (ts *Tribserver) CreateUser(args *tribproto.CreateUserArgs, reply *tribproto.CreateUserReply) os.Error {
 	//if a map fot that user exists (present is true) return EEXISTS
-	if _, stat := ts.tm.GET(args.Userid + LAST); stat == storageproto.EITEMEXISTS{
+	 _, stat, err := ts.tm.GET(args.Userid + LAST)
+	if (err != nil) {
+		return err
+	}
+	if stat == storageproto.EITEMEXISTS {
 			reply.Status = tribproto.EEXISTS
-	} else {
+	} else  {
 			//initialize the 3 maps for the user
 			val, _ := json.Marshal(0)
 			ts.tm.PUT(args.Userid + LAST, val)
@@ -38,9 +42,17 @@ func (ts *Tribserver) CreateUser(args *tribproto.CreateUserArgs, reply *tribprot
 
 func (ts *Tribserver) AddSubscription(args *tribproto.SubscriptionArgs, reply *tribproto.SubscriptionReply) os.Error{
 	//check if user exists
-	if _, stat := ts.tm.GET(args.Userid + LAST); stat == storageproto.EITEMEXISTS{
+	_, stat, err := ts.tm.GET(args.Userid + LAST)
+	if (err != nil) {
+		return err
+	}
+	if stat == storageproto.EITEMEXISTS{
 		//check if target user exists
-		if _, stat := ts.tm.GET(args.Targetuser + LAST); stat == storageproto.EITEMEXISTS {
+		_, stat, err := ts.tm.GET(args.Targetuser + LAST);
+		if err != nil {
+			return err
+		}
+		if stat == storageproto.EITEMEXISTS {
 			val, err := json.Marshal(args.Targetuser)
 			if (err != nil) {
 				return err
@@ -57,9 +69,17 @@ func (ts *Tribserver) AddSubscription(args *tribproto.SubscriptionArgs, reply *t
 
 func (ts *Tribserver) RemoveSubscription(args *tribproto.SubscriptionArgs, reply *tribproto.SubscriptionReply) os.Error {
 	//check if user exists
-	if _, stat := ts.tm.GET(args.Userid + LAST); stat == storageproto.EITEMEXISTS {
+	_, stat,err := ts.tm.GET(args.Userid + LAST); 
+	if (err != nil) {
+		return err
+	}
+	if stat == storageproto.EITEMEXISTS {
 		//check if target user exists
-		if _, stat := ts.tm.GET(args.Targetuser + LAST); stat == storageproto.EITEMEXISTS{
+		_, stat, err := ts.tm.GET(args.Targetuser + LAST)
+		if (err != nil) {
+			return err
+		}
+		if stat == storageproto.EITEMEXISTS{
 			val, err := json.Marshal(args.Targetuser)
 			if (err != nil) {
 				return err
@@ -75,7 +95,11 @@ func (ts *Tribserver) RemoveSubscription(args *tribproto.SubscriptionArgs, reply
 }
 
 func (ts *Tribserver) GetSubscriptions(args *tribproto.GetSubscriptionsArgs, reply *tribproto.GetSubscriptionsReply) os.Error {
-	if suscribersJson, stat := ts.tm.GET(args.Userid + SUBSCRIPTIONS); stat == storageproto.EITEMEXISTS {
+	suscribersJson, stat, err := ts.tm.GET(args.Userid + SUBSCRIPTIONS)
+	if (err != nil) {
+		return err
+	}
+	if stat == storageproto.EITEMEXISTS {
 		subscribers := make(map [string] bool)
 		err := json.Unmarshal(suscribersJson, &subscribers)
 		if (err != nil) {
@@ -95,7 +119,11 @@ func (ts *Tribserver) GetSubscriptions(args *tribproto.GetSubscriptionsArgs, rep
 }
 
 func (ts *Tribserver) PostTribble(args *tribproto.PostTribbleArgs, reply *tribproto.PostTribbleReply) os.Error {
-	if lastJson, stat := ts.tm.GET(args.Userid + LAST); stat == storageproto.EITEMEXISTS { 
+	lastJson, stat, err := ts.tm.GET(args.Userid + LAST)
+	if (err != nil) {
+		return err
+	}
+	if stat == storageproto.EITEMEXISTS {
 		 last := new(int)
 		 json.Unmarshal(lastJson, last)
 		 *last++
@@ -107,11 +135,9 @@ func (ts *Tribserver) PostTribble(args *tribproto.PostTribbleArgs, reply *tribpr
 		 tribble.Contents = args.Contents
 
 		 val, err := json.Marshal(tribble)
-		
 		if (err != nil) {
 			return err
 		}
-		
 		_ := ts.tm.PUT(args.Userid + lastStr, val)
 		val, err = json.Marshal(*last)
 		if (err != nil) {
