@@ -12,6 +12,7 @@ import (
 	"net"
 	"log"
 	"fmt"
+	"json"
 )
 
 type Storageserver struct {
@@ -99,61 +100,50 @@ func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *sto
 }
 
 func (ss *Storageserver) GetRPC(args *storageproto.GetArgs, reply *storageproto.GetReply) os.Error {
-	val, ok := ss.tm.GET(args.Key)
-	if (!ok) {
-		reply.Status = storageproto.EKEYNOTFOUND
-	} else {
-		reply.Status = storageproto.OK
+	val, status := ss.tm.GET(args.Key)
+	reply.Status = status
+	if (status == storageproto.OK) {
 		reply.Value = string(val)
 	}
 	return nil
 }
 
 func (ss *Storageserver) GetListRPC(args *storageproto.GetArgs, reply *storageproto.GetListReply) os.Error {
-	val, ok := ss.tm.GET(args.Key)
-	if (!ok) {
-		reply.Status = storageproto.EKEYNOTFOUND
-	} else {
+	val, status := ss.tm.GET(args.Key)
+	reply.Status = status
+	if (status == storageproto.OK) {
 		set := make(map[string] bool)
 		err := json.Unmarshal(val, &set)
 		if (err != nil) {
-			reply.Status = EKEYNOTFOUND
+			reply.Status = storageproto.EPUTFAILED
 		} else {
 			reply.Value = make([]string, len(set))
 			i:=0
-			for k, _ = range set {
-				reply.Value[i]=k
+			for key, _ := range set {
+				reply.Value[i]=key
 				i++
 			}
-			reply.Status = OK
 		}
-
 	}
 	return nil
 }
 
 func (ss *Storageserver) PutRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
-	ss.tm.PUT(args.Key, []byte(args.Value))
-	reply.Status = storageproto.OK
-}
-
-func (ss *Storageserver) AppendToListRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
-	err := ss.tm.AddToList(args.Key, []byte(args.Value))
-	if (err == nil) {
-		reply.Status = storageproto.OK
-	} else {
-		reply.Status = storageproto.EPUTFAILED
-	}
+	status := ss.tm.PUT(args.Key, []byte(args.Value))
+	reply.Status = status
 	return nil
 }
 
+func (ss *Storageserver) AppendToListRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
+	status, err := ss.tm.AddToList(args.Key, []byte(args.Value))
+	reply.Status = status
+	return err
+}
+
 func (ss *Storageserver) RemoveFromListRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
-	err, ok := ss.tm.RemoveFromList(args.Key, []byte(args.Value))
-	if (err != nil || !ok) {
-		reply.Status = storageproto.EITEMNOTFOUND
-	} else {
-		reply.Status = storageproto.OK
-	}
+	status, err := ss.tm.RemoveFromList(args.Key, []byte(args.Value))
+	reply.Status = status
+	return err
 }
 
 func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
@@ -162,21 +152,17 @@ func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeid {
-		res, stat := ss.tm.GET(key) 
+		res, stat := ss.tm.GET(key)
 		return res, stat, nil
-
-	}else{
-		//if not, call correct server via rpc
-		args := &storageproto.GetArgs{key}
-		var reply storageproto.GetReply
-
-	 	err := serv.rpc.Call("StorageRPC.Get", args, &reply)
-		
-		if (err != nil) {
-				return nil, 0, err 
-		}
-		return []byte(reply.Value), reply.Status, nil
-	  }
+	}
+	//if not, call correct server via rpc
+	args := &storageproto.GetArgs{key}
+	var reply storageproto.GetReply
+	err := serv.rpc.Call("StorageRPC.Get", args, &reply)
+	if (err != nil) {
+		return nil, 0, err
+	}
+	return []byte(reply.Value), reply.Status, nil
 }
 
 func (ss *Storageserver) PUT(key string, val []byte) (int, os.Error) {
@@ -185,20 +171,16 @@ func (ss *Storageserver) PUT(key string, val []byte) (int, os.Error) {
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeid {
-		return ss.tm.PUT(key, val), nil      
-	
-	}else{
-		//if not, call correct server via rpc
-		args := &storageproto.PutArgs{key, string(val)}
-		var reply storageproto.PutReply
-		
-		err := serv.rpc.Call("StorageRPC.Put", args, &reply)
-		
-		if (err != nil) {
-		  return 0, err
-	  }
-		return reply.Status, nil
+		return ss.tm.PUT(key, val), nil
 	}
+	//if not, call correct server via rpc
+	args := &storageproto.PutArgs{key, string(val)}
+	var reply storageproto.PutReply
+	err := serv.rpc.Call("StorageRPC.Put", args, &reply)
+	if (err != nil) {
+		return 0, err
+	}
+	return reply.Status, nil
 }
 
 func (ss *Storageserver) AddToList(key string, element []byte) (int, os.Error) {
@@ -207,20 +189,16 @@ func (ss *Storageserver) AddToList(key string, element []byte) (int, os.Error) {
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeid {
-		return ss.tm.AddToList(key, element), nil      
-	
-	}else{
-		//if not, call correct server via rpc
-		args := &storageproto.PutArgs{key, string(element)}
-		var reply storageproto.PutReply
-	
-		err := serv.rpc.Call("StorageRPC.AppendToList", args, &reply)
-		
-		if (err != nil) {
-		  return 0, err
-	  }
-		return reply.Status, nil
+		return ss.tm.AddToList(key, element)
 	}
+	//if not, call correct server via rpc
+	args := &storageproto.PutArgs{key, string(element)}
+	var reply storageproto.PutReply
+	err := serv.rpc.Call("StorageRPC.AppendToList", args, &reply)
+	if (err != nil) {
+		return 0, err
+	}
+	return reply.Status, nil
 }
 
 func (ss *Storageserver) RemoveFromList(key string, element []byte) (int, os.Error) {
@@ -229,28 +207,23 @@ func (ss *Storageserver) RemoveFromList(key string, element []byte) (int, os.Err
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeid {
-		return ss.tm.RemoveFromList(key, element), nil      
-	
-	}else{
-		//if not, call correct server via rpc
-		args := &storageproto.PutArgs{key, string(element)}
-		var reply storageproto.PutReply
-
-		err := serv.rpc.Call("StorageRPC.RemoveFromList", args, &reply)
-		
-		if (err != nil) {
-		  return 0, err
-	  }
-		return reply.Status, nil
+		return ss.tm.RemoveFromList(key, element)
 	}
+	//if not, call correct server via rpc
+	args := &storageproto.PutArgs{key, string(element)}
+	var reply storageproto.PutReply
+	err := serv.rpc.Call("StorageRPC.RemoveFromList", args, &reply)
+	if (err != nil) {
+		return 0, err
+	}
+	return reply.Status, nil
 }
 
 func (ss *Storageserver) GetIndex(key string) (int) {
 	fields := strings.Split(key, ":")
-	user := fields[0]			
- 	h := fnv.New32()
+	user := fields[0]
+	h := fnv.New32()
 	h.Write([]byte(user))
-	
 	return (int(h.Sum32()) % len(ss.servers)) - 1
 }
 
