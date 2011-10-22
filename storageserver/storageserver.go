@@ -17,7 +17,7 @@ import (
 
 type Storageserver struct {
 	tm *storage.TribMap
-	servers []*serverData
+	servers []serverData
 	numnodes int
 	nodeid uint32
 	cond *sync.Cond
@@ -45,29 +45,25 @@ func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *
 				if (err != nil) {
 					log.Printf("Something went wrong with the call; retrying")
 				} else if reply.Ready {
-						ss.servers = make([]*serverData, len(reply.Clients))
-						for i:=0; i < len(reply.Clients); i++ {
-							ss.servers[i] = &serverData{nil, reply.Clients[i]}
+					ss.servers = make([]serverData, len(reply.Clients))
+					for i:=0; i < len(reply.Clients); i++ {
+						ss.servers[i] = serverData{nil, reply.Clients[i]}
+						if (ss.servers[i].clientInfo.NodeID != ss.nodeid) {
+							ss.servers[i].rpc, err = rpc.DialHTTP("tcp", ss.servers[i].clientInfo.HostPort)
+							if (err != nil) {
+								log.Fatal("Problem making rpc connection")
+							}
 						}
+					}
 					break
 				}
 				time.Sleep(1000000000)
 			}
 		}
 	} else {
-		ss.servers = make([]*serverData, numnodes)
-		ss.cond.L.Lock()
-		for numnodes != 0 {
-			ss.cond.Wait()
-		}
-		ss.cond.L.Unlock()
-	}
-	for i:=0; i < len(ss.servers); i++ {
-		var err os.Error
-		ss.servers[i].rpc, err = rpc.DialHTTP("tcp", ss.servers[i].clientInfo.HostPort)
-		if err != nil {
-			log.Fatal("Problem creating rpc connection to %s", ss.servers[i].clientInfo.HostPort)
-		}
+		ss.servers = make([]serverData, numnodes)
+		ss.servers[numnodes - 1] = serverData{nil, storageproto.Client{"", nodeid}}
+		numnodes--
 	}
 	return ss
 }
@@ -82,20 +78,23 @@ func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *
 // These should do something! :-)
 
 func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *storageproto.RegisterReply) os.Error {
-	ss.cond.L.Lock()
+	reply.Ready = false
+	var err os.Error
 	if (ss.numnodes > 0) {
 		ss.servers[ss.numnodes - 1].clientInfo = args.ClientInfo
+		ss.servers[ss.numnodes - 1].rpc, err = rpc.DialHTTP("tcp", ss.servers[ss.numnodes -1].clientInfo.HostPort)
+                if err != nil {
+                        log.Fatal("Problem creating rpc connection to %s", ss.servers[ss.numnodes - 1].clientInfo.HostPort)
+                }
+
 		ss.numnodes--
-	}
-	reply.Ready = false
-	if (ss.numnodes == 0) {
-		ss.cond.Broadcast()
+	} else if (ss.numnodes == 0) {
 		reply.Ready = true
+		reply.Clients = make([]storageproto.Client, len(ss.servers))
 		for i:=0; i < len(ss.servers); i++ {
 			reply.Clients[i] = ss.servers[i].clientInfo
 		}
 	}
-	ss.cond.L.Unlock()
 	return nil
 }
 
@@ -147,7 +146,7 @@ func (ss *Storageserver) RemoveFromListRPC(args *storageproto.PutArgs, reply *st
 }
 
 func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
-  index := ss.GetIndex(key)
+  	index := ss.GetIndex(key)
 	serv := ss.servers[index]
 
 	//if local server call server tribmap
@@ -224,6 +223,6 @@ func (ss *Storageserver) GetIndex(key string) (int) {
 	user := fields[0]
 	h := fnv.New32()
 	h.Write([]byte(user))
-	return (int(h.Sum32()) % len(ss.servers)) - 1
+	return int(h.Sum32()) % len(ss.servers)
 }
 

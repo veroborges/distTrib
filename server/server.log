@@ -1,35 +1,147 @@
-2011/10/13 01:26:17 Server starting on port 18215
-2011/10/13 01:26:18 Server starting on port 36859
-2011/10/13 01:26:18 Server starting on port 30962
-2011/10/13 01:26:19 Server starting on port 13106
-2011/10/13 01:26:20 Server starting on port 48991
-2011/10/13 01:26:20 Server starting on port 38441
-2011/10/13 01:26:21 Server starting on port 13081
-2011/10/13 01:32:02 Server starting on port 25324
-2011/10/13 01:32:02 Server starting on port 50929
-2011/10/13 01:32:03 Server starting on port 35182
-2011/10/13 01:32:04 Server starting on port 37045
-2011/10/13 01:32:04 Server starting on port 59811
-2011/10/13 01:32:05 Server starting on port 10677
-2011/10/13 01:32:06 Server starting on port 23722
-2011/10/13 01:43:02 Server starting on port 51050
-2011/10/13 01:43:03 Server starting on port 14515
-2011/10/13 01:43:03 Server starting on port 56207
-2011/10/13 01:43:04 Server starting on port 57517
-2011/10/13 01:43:05 Server starting on port 17232
-2011/10/13 01:43:05 Server starting on port 51109
-2011/10/13 01:43:06 Server starting on port 30971
-2011/10/13 01:47:29 Server starting on port 32446
-2011/10/13 01:47:29 Server starting on port 12724
-2011/10/13 01:47:30 Server starting on port 20431
-2011/10/13 01:47:30 Server starting on port 23521
-2011/10/13 01:47:31 Server starting on port 24405
-2011/10/13 01:47:32 Server starting on port 54687
-2011/10/13 01:47:32 Server starting on port 29259
-2011/10/13 01:49:55 Server starting on port 16022
-2011/10/13 01:49:56 Server starting on port 59770
-2011/10/13 01:49:56 Server starting on port 38490
-2011/10/13 01:49:57 Server starting on port 11274
-2011/10/13 01:49:58 Server starting on port 38109
-2011/10/13 01:49:58 Server starting on port 17985
-2011/10/13 01:49:59 Server starting on port 44032
+2011/10/22 17:13:57 Server starting on port 53509
+2011/10/22 17:13:58 Server starting on port 48738
+2011/10/22 17:13:58 Server starting on port 56062
+panic: runtime error: index out of range
+
+runtime.panic+0xac /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:1060
+	runtime.panic(0x58e468, 0xf84000f910)
+runtime.panicstring+0xa3 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/runtime.c:116
+	runtime.panicstring(0x6bfaee, 0xf840000690)
+runtime.panicindex+0x25 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/runtime.c:73
+	runtime.panicindex()
+storageserver.*Storageserver·GET+0x6f /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:150
+	storageserver.*Storageserver·GET(0xf840045900, 0xf84000f930, 0xf800000008, 0x5bf844, 0x73616c3a00000005, ...)
+main.*Tribserver·CreateUser+0x61 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:26
+	main.*Tribserver·CreateUser(0xf8400006c0, 0xf8400c9350, 0xf840000980, 0x0, 0x0, ...)
+----- stack segment boundary -----
+reflect.internalValue·call+0xf34 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/reflect/value.go:583
+	reflect.internalValue·call(0x564360, 0x13, 0x400c00, 0x0, 0x0, ...)
+reflect.Value·Call+0xd6 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/reflect/value.go:433
+	reflect.Value·Call(0x564350, 0x400c00, 0x0, 0xf84009f550, 0x300000003, ...)
+rpc.*service·call+0x127 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:339
+	rpc.*service·call(0xf840023f40, 0xf840045a50, 0xf840000328, 0xf840024e80, 0xf840046aa0, ...)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+rpc.*Server·ServeCodec+0x840 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:440
+
+goroutine 3 [3]:
+runtime.entersyscall+0x78 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:639
+	runtime.entersyscall()
+syscall.Syscall+0x5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:15
+	syscall.Syscall()
+syscall.Read+0x62 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:498
+	syscall.Read(0xf800000007, 0xf8400c6000, 0x100000001000, 0xf8400c9350, 0x7f0e463cf7f0, ...)
+net.*netFD·Read+0x172 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:378
+	net.*netFD·Read(0xf840025e60, 0xf8400c6000, 0x100000001000, 0x0, 0x0, ...)
+net.*TCPConn·Read+0x95 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:96
+	net.*TCPConn·Read(0xf840000660, 0xf8400c6000, 0x100000001000, 0xf8400000000, 0x0, ...)
+bufio.*Reader·fill+0xf0 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/bufio/bufio.go:99
+	bufio.*Reader·fill(0xf84009b840, 0xc)
+bufio.*Reader·Read+0x188 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/bufio/bufio.go:161
+	bufio.*Reader·Read(0xf84009b840, 0xf84000fce0, 0x900000001, 0x1, 0x0, ...)
+gob.decodeUintReader+0x81 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decode.go:65
+	gob.decodeUintReader(0xf840043d80, 0xf84009b840, 0xf84000fce0, 0x900000009, 0x0, ...)
+gob.*Decoder·recvMessage+0x43 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:65
+	gob.*Decoder·recvMessage(0xf8400320d0, 0x0, 0xf8400320e8, 0x0)
+gob.*Decoder·decodeTypeSequence+0x53 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:128
+	gob.*Decoder·decodeTypeSequence(0xf8400320d0, 0xf840046e00, 0x0, 0x0, 0x50f858, ...)
+gob.*Decoder·DecodeValue+0xed /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:192
+	gob.*Decoder·DecodeValue(0xf8400320d0, 0x50f848, 0xf840046ee0, 0x0, 0x0, ...)
+gob.*Decoder·Decode+0x165 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:171
+	gob.*Decoder·Decode(0xf8400320d0, 0x50f848, 0xf840046ee0, 0xf840046ee0, 0x410be9, ...)
+rpc.*gobServerCodec·ReadRequestHeader+0x4e /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:358
+	rpc.*gobServerCodec·ReadRequestHeader(0xf840043ed0, 0xf840046ee0, 0x41aa44, 0x419f4c, 0x41aa44, ...)
+rpc.*Server·readRequest+0x74 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:488
+	rpc.*Server·readRequest(0xf840045a50, 0xf84009b880, 0xf840043ed0, 0xf840046ee0, 0x0, ...)
+rpc.*Server·ServeCodec+0x68 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:396
+	rpc.*Server·ServeCodec(0xf840045a50, 0xf84009b880, 0xf840043ed0, 0xf84009b880)
+rpc.*Server·ServeConn+0x137 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:388
+	rpc.*Server·ServeConn(0xf840045a50, 0xf84009b380, 0xf840000660, 0xf84009b380)
+rpc.*Server·ServeHTTP+0x30c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:592
+	rpc.*Server·ServeHTTP(0xf840045a50, 0xf84009b2c0, 0xf84009b180, 0xf840022f00, 0xf840045a50, ...)
+http.*ServeMux·ServeHTTP+0x189 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:797
+	http.*ServeMux·ServeHTTP(0xf840000298, 0xf84009b2c0, 0xf84009b180, 0xf840022f00, 0xf84009b180, ...)
+http.*conn·serve+0x229 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:546
+	http.*conn·serve(0xf84009f4b0, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+http.*Server·Serve+0x312 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:893
+
+goroutine 2 [3]:
+runtime.entersyscall+0x78 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:639
+	runtime.entersyscall()
+syscall.Syscall6+0x5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:40
+	syscall.Syscall6()
+syscall.EpollWait+0x80 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:200
+	syscall.EpollWait(0xf800000006, 0xf840026f30, 0xa0000000a, 0xffffffff, 0xc, ...)
+net.*pollster·WaitFD+0xf5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd_linux.go:141
+	net.*pollster·WaitFD(0xf840026f20, 0xf840023e80, 0x0, 0x7200000007, 0x0, ...)
+net.*pollServer·Run+0xcb /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:226
+	net.*pollServer·Run(0xf840023e80, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+net.newPollServer+0x328 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/newpollserver.go:34
+
+goroutine 1 [4]:
+runtime.gosched+0x5c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:603
+	runtime.gosched()
+runtime.chanrecv+0x177 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/chan.c:361
+	runtime.chanrecv(0xf84002ef60, 0x7f0e46382d68, 0x0, 0x0, 0x300000000, ...)
+runtime.chanrecv1+0x4a /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/chan.c:424
+	runtime.chanrecv1(0xf84002ef60, 0xf840025f00)
+net.*pollServer·WaitRead+0x49 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:255
+	net.*pollServer·WaitRead(0xf840023e80, 0xf840025f00, 0x0, 0x0)
+net.*netFD·accept+0x347 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:605
+	net.*netFD·accept(0xf840025f00, 0x43fb04, 0x0, 0x0, 0x0, ...)
+net.*TCPListener·AcceptTCP+0x71 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:272
+	net.*TCPListener·AcceptTCP(0xf8400002b0, 0x59d1e8, 0x0, 0x0, 0x8, ...)
+net.*TCPListener·Accept+0x49 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:282
+	net.*TCPListener·Accept(0xf8400002b0, 0x0, 0x0, 0x0, 0x0, ...)
+http.*Server·Serve+0xd9 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:875
+	http.*Server·Serve(0xf840043750, 0xf840023980, 0xf8400002b0, 0x0, 0x0, ...)
+http.Serve+0x70 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:839
+	http.Serve(0xf840023980, 0xf8400002b0, 0x0, 0x0, 0xf840023980, ...)
+main.main+0x32a /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:294
+	main.main()
+runtime.mainstart+0xf /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/amd64/asm.s:77
+	runtime.mainstart()
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+_rt0_amd64+0x8e /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/amd64/asm.s:64
+2011/10/22 17:17:23 Server starting on port 26411
+2011/10/22 17:17:23 Server starting on port 48085
+2011/10/22 17:17:24 Server starting on port 33622
+2011/10/22 17:18:07 Server starting on port 52817
+2011/10/22 17:18:07 Server starting on port 14278
+2011/10/22 17:18:08 Server starting on port 34788
+2011/10/22 17:18:09 Server starting on port 18919
+2011/10/22 17:23:21 Server starting on port 59251
+2011/10/22 17:23:21 Server starting on port 25969
+2011/10/22 17:23:22 Server starting on port 13699
+2011/10/22 17:23:22 Server starting on port 21919
+2011/10/22 17:23:33 Server starting on port 59051
+2011/10/22 17:23:33 Server starting on port 24764
+2011/10/22 17:23:34 Server starting on port 28535
+2011/10/22 17:23:34 Server starting on port 20860
+2011/10/22 17:23:53 Server starting on port 38147
+2011/10/22 17:23:54 Server starting on port 59990
+2011/10/22 17:23:54 Server starting on port 16376
+2011/10/22 17:23:55 Server starting on port 57397
+2011/10/22 17:23:56 Server starting on port 58334
+2011/10/22 17:24:12 Server starting on port 20931
+2011/10/22 17:24:13 Server starting on port 33483
+2011/10/22 17:24:14 Server starting on port 54903
+2011/10/22 17:24:14 Server starting on port 21542
+2011/10/22 17:24:15 Server starting on port 16825
+2011/10/22 17:24:16 Server starting on port 27710
+2011/10/22 17:24:29 Server starting on port 28113
+2011/10/22 17:24:29 Server starting on port 12291
+2011/10/22 17:24:30 Server starting on port 35521
+2011/10/22 17:24:30 Server starting on port 27772
+2011/10/22 17:24:31 Server starting on port 34284
+2011/10/22 17:24:32 Server starting on port 39132
+2011/10/22 17:24:33 Server starting on port 14083

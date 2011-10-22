@@ -15,6 +15,7 @@ import (
 	"container/heap"
 	"storageproto"
 	"storageserver"
+	"storagerpc"
 )
 
 const SUBSCRIPTIONS string = ":subscriptions"
@@ -26,14 +27,14 @@ func (ts *Tribserver) CreateUser(args *tribproto.CreateUserArgs, reply *tribprot
 	if (err != nil) {
 		return err
 	}
-	if stat == storageproto.EITEMEXISTS {
-			reply.Status = tribproto.EEXISTS
+	if stat == storageproto.OK {
+		reply.Status = tribproto.EEXISTS
 	} else  {
-			//initialize the 3 maps for the user
-			val, _ := json.Marshal(0)
-			ts.tm.PUT(args.Userid + LAST, val)
-			val, _ = json.Marshal(make(map[string] bool))
-			ts.tm.PUT(args.Userid + SUBSCRIPTIONS, val)
+		//initialize the 3 maps for the user
+		val, _ := json.Marshal(0)
+		ts.tm.PUT(args.Userid + LAST, val)
+		val, _ = json.Marshal(make(map[string] bool))
+		ts.tm.PUT(args.Userid + SUBSCRIPTIONS, val)
 	}
 	return nil
 }
@@ -46,13 +47,13 @@ func (ts *Tribserver) AddSubscription(args *tribproto.SubscriptionArgs, reply *t
 	if (err != nil) {
 		return err
 	}
-	if stat == storageproto.EITEMEXISTS{
+	if stat == storageproto.OK{
 		//check if target user exists
 		_, stat, err := ts.tm.GET(args.Targetuser + LAST);
 		if err != nil {
 			return err
 		}
-		if stat == storageproto.EITEMEXISTS {
+		if stat == storageproto.OK {
 			val, err := json.Marshal(args.Targetuser)
 			if (err != nil) {
 				return err
@@ -73,13 +74,13 @@ func (ts *Tribserver) RemoveSubscription(args *tribproto.SubscriptionArgs, reply
 	if (err != nil) {
 		return err
 	}
-	if stat == storageproto.EITEMEXISTS {
+	if stat == storageproto.OK {
 		//check if target user exists
 		_, stat, err := ts.tm.GET(args.Targetuser + LAST)
 		if (err != nil) {
 			return err
 		}
-		if stat == storageproto.EITEMEXISTS{
+		if stat == storageproto.OK{
 			val, err := json.Marshal(args.Targetuser)
 			if (err != nil) {
 				return err
@@ -99,7 +100,7 @@ func (ts *Tribserver) GetSubscriptions(args *tribproto.GetSubscriptionsArgs, rep
 	if (err != nil) {
 		return err
 	}
-	if stat == storageproto.EITEMEXISTS {
+	if stat == storageproto.OK {
 		subscribers := make(map [string] bool)
 		err := json.Unmarshal(suscribersJson, &subscribers)
 		if (err != nil) {
@@ -123,7 +124,7 @@ func (ts *Tribserver) PostTribble(args *tribproto.PostTribbleArgs, reply *tribpr
 	if (err != nil) {
 		return err
 	}
-	if stat == storageproto.EITEMEXISTS {
+	if stat == storageproto.OK {
 		 last := new(int)
 		 json.Unmarshal(lastJson, last)
 		 *last++
@@ -138,7 +139,10 @@ func (ts *Tribserver) PostTribble(args *tribproto.PostTribbleArgs, reply *tribpr
 		if (err != nil) {
 			return err
 		}
-		_ := ts.tm.PUT(args.Userid + lastStr, val)
+		_, err = ts.tm.PUT(args.Userid + lastStr, val)
+		if (err != nil) {
+			return err
+		}
 		val, err = json.Marshal(*last)
 		if (err != nil) {
 			return err
@@ -155,7 +159,7 @@ func (ts *Tribserver) GetTribbles(args *tribproto.GetTribblesArgs, reply *tribpr
 	if err != nil {
 		return err
 	}
-	if stat == storageproto.EITEMEXISTS{
+	if stat == storageproto.OK{
 		last := new(int)
 		err := json.Unmarshal(lastJson, last)
 		if (err != nil) {
@@ -172,7 +176,7 @@ func (ts *Tribserver) GetTribbles(args *tribproto.GetTribblesArgs, reply *tribpr
 			if err != nil{
 				return err
 			}
-			if stat == storageproto.EITEMEXISTS {
+			if stat == storageproto.OK {
 				trib := new(tribproto.Tribble)
 				err := json.Unmarshal(tribJson, trib)
 				if (err != nil) {
@@ -193,7 +197,7 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 	if err != nil {
 		return err
 	}
-	if stat == storageproto.EITEMEXISTS{
+	if stat == storageproto.OK{
 		suscribers := make(map [string] bool)
 		json.Unmarshal(suscribJson, &suscribers)
 		recentTribs := vector.Vector(make([]interface{},0, 100))
@@ -211,7 +215,7 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 				}
 				log.Printf("last %s", string(lastJson))
 				last := new(int)
-				err := json.Unmarshal(lastJson, last)
+				err = json.Unmarshal(lastJson, last)
 				if (err != nil) {
 					return err
 				}
@@ -224,7 +228,7 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 					if err != nil {
 						return err
 					}
-					if stat == storageproto.EITEMEXISTS {
+					if stat == storageproto.OK {
 						log.Printf("%s %s", tribbleId, tribJson)
 						trib := new(tribproto.Tribble)
 						err = json.Unmarshal(tribJson, trib)
@@ -271,7 +275,7 @@ func NewTribserver(ss *storageserver.Storageserver) *Tribserver {
 
 var portnum *int = flag.Int("port", 9009, "port # to listen on")
 var storageMasterNodePort *string = flag.String("master", "localhost:9009", "Storage master node")
-var numNodes *int = flag.Int("N", 0, "Become the master.  Specifies the number of nodes in the system, including the master")
+var numNodes *int = flag.Int("N", 1, "Become the master.  Specifies the number of nodes in the system, including the master")
 var nodeID *uint = flag.Uint("id", 0, "The node ID to use for consistent hashing.  Should be a 32 bit number.")
 
 func main() {
