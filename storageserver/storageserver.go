@@ -16,7 +16,7 @@ import (
 
 type Storageserver struct {
 	tm *storage.TribMap
-	servers []serverData
+	servers []*serverData
 	numnodes int
 	nodeid uint32
 	cond *sync.Cond
@@ -30,7 +30,7 @@ type serverData struct {
 func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *Storageserver {
 	ss := &Storageserver{storage.NewTribMap(), nil, numnodes, nodeid, nil}
 	var lock sync.Mutex
-	ss.cond = sync.NewCond(lock)
+	ss.cond = sync.NewCond(&lock)
 	socket := net.JoinHostPort(master, fmt.Sprintf("%d", portnum))
 	if (numnodes == 0) {
 		for {
@@ -40,29 +40,30 @@ func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *
 				time.Sleep(1000000000)
 			} else {
 				reply := new(storageproto.RegisterReply)
-				err = master.Call("StorageRPC.Register",&RegisterArgs{Client{socket, nodeid}}, reply)
+				err = master.Call("StorageRPC.Register",&storageproto.RegisterArgs{storageproto.Client{socket, nodeid}}, reply)
 				if (err != nil) {
 					log.Printf("Something went wrong with the call; retrying")
 				} else if reply.Ready {
-					ss.servers = make([]serverData, serverlen(reply.Clients))
-					for i:=0; i < len(reply.Clients); i++ {
-						ss.servers[i] = &serverData{nil, reply.Clients[i]}
-					}
+						ss.servers = make([]*serverData, len(reply.Clients))
+						for i:=0; i < len(reply.Clients); i++ {
+							ss.servers[i] = &serverData{nil, reply.Clients[i]}
+						}
 					break
 				}
 				time.Sleep(1000000000)
 			}
 		}
 	} else {
-		ss.servers = make([]serverData, numnodes)
+		ss.servers = make([]*serverData, numnodes)
 		ss.cond.L.Lock()
 		for numnodes != 0 {
 			ss.cond.Wait()
 		}
-		ss.cond.Unlock()
+		ss.cond.L.Unlock()
 	}
-	for i:=0; i < len(reply.Clients); i++ {
-		ss.servers[i].rpc, err := rpc.DialHTTP("tcp", ss.servers[i].clientInfo.HostPort)
+	for i:=0; i < len(ss.servers); i++ {
+		var err os.Error
+		ss.servers[i].rpc, err = rpc.DialHTTP("tcp", ss.servers[i].clientInfo.HostPort)
 		if err != nil {
 			log.Fatal("Problem creating rpc connection to %s", ss.servers[i].clientInfo.HostPort)
 		}
@@ -81,19 +82,19 @@ func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *
 
 func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *storageproto.RegisterReply) os.Error {
 	ss.cond.L.Lock()
-	if (numnodes > 0) {
-		ss.servers[numnodes - 1].clientInfo = args.ClientInfo
-		numnodes--
+	if (ss.numnodes > 0) {
+		ss.servers[ss.numnodes - 1].clientInfo = args.ClientInfo
+		ss.numnodes--
 	}
 	reply.Ready = false
-	if (numnodes == 0) {
+	if (ss.numnodes == 0) {
 		ss.cond.Broadcast()
 		reply.Ready = true
 		for i:=0; i < len(ss.servers); i++ {
 			reply.Clients[i] = ss.servers[i].clientInfo
 		}
 	}
-	ss.cond.Unlock()
+	ss.cond.L.Unlock()
 	return nil
 }
 
@@ -124,38 +125,39 @@ func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
 	serv := ss.servers[index]
 
 	//if local server call server tribmap
-	if serv.nodeid == ss.nodeid {
-		return ss.tm.GET(key), nil //can i do this? 
+	if serv.clientInfo.NodeID == ss.nodeid {
+		res, stat := ss.tm.GET(key) 
+		return res, stat, nil
 
 	}else{
 		//if not, call correct server via rpc
 		args := &storageproto.GetArgs{key}
-		var reply tribproto.GetReply
+		var reply storageproto.GetReply
 
-	 	err := serv.server.Call("StorageRPC.Get", args, &reply)
+	 	err := serv.rpc.Call("StorageRPC.Get", args, &reply)
 		
 		if (err != nil) {
-				return nil, 0, err //is this the correct status for when err?
+				return nil, 0, err 
 		}
 			
 		return []byte(reply.Value), reply.Status, nil	
 	  }
 }
 
-func (ss *Storageserver) PUT(key string, val []byte) (bool, os.Error) {
+func (ss *Storageserver) PUT(key string, val []byte) (int, os.Error) {
 	index := ss.GetIndex(key)
 	serv := ss.servers[index]
 
 	//if local server call server tribmap
-	if serv.nodeid == ss.nodeid {
+	if serv.clientInfo.NodeID == ss.nodeid {
 		return ss.tm.PUT(key, val), nil      
 	
 	}else{
 		//if not, call correct server via rpc
 		args := &storageproto.PutArgs{key, string(val)}
-		var reply tribproto.PutReply
+		var reply storageproto.PutReply
 		
-		err := serv.server.Call("StorageRPC.Put", args, &reply)
+		err := serv.rpc.Call("StorageRPC.Put", args, &reply)
 		
 		if (err != nil) {
 		  return 0, err
@@ -165,20 +167,20 @@ func (ss *Storageserver) PUT(key string, val []byte) (bool, os.Error) {
 	}
 }
 
-func (ss *Storageserver) AddToList(key string, element []byte) (bool, os.Error) {
+func (ss *Storageserver) AddToList(key string, element []byte) (int, os.Error) {
 	index := ss.GetIndex(key)
 	serv := ss.servers[index]
 
 	//if local server call server tribmap
-	if serv.nodeid == ss.nodeid {
+	if serv.clientInfo.NodeID == ss.nodeid {
 		return ss.tm.AddToList(key, element), nil      
 	
 	}else{
 		//if not, call correct server via rpc
 		args := &storageproto.PutArgs{key, string(element)}
-		var reply tribproto.PutReply
+		var reply storageproto.PutReply
 	
-		err := serv.server.Call("StorageRPC.AppendToList", args, &reply)
+		err := serv.rpc.Call("StorageRPC.AppendToList", args, &reply)
 		
 		if (err != nil) {
 		  return 0, err
@@ -188,20 +190,20 @@ func (ss *Storageserver) AddToList(key string, element []byte) (bool, os.Error) 
 	}
 }
 
-func (ss *Storageserver) RemoveFromList(key string, element []byte) (bool, os.Error) {
+func (ss *Storageserver) RemoveFromList(key string, element []byte) (int, os.Error) {
 	index := ss.GetIndex(key)
 	serv := ss.servers[index]
 
 	//if local server call server tribmap
-	if serv.nodeid == ss.nodeid {
+	if serv.clientInfo.NodeID == ss.nodeid {
 		return ss.tm.RemoveFromList(key, element), nil      
 	
 	}else{
 		//if not, call correct server via rpc
-		args := &storageproto.PutArgs{key, string(value)}
-		var reply tribproto.PutReply
+		args := &storageproto.PutArgs{key, string(element)}
+		var reply storageproto.PutReply
 
-		err := serv.server.Call("StorageRPC.RemoveFromList", args, &reply)
+		err := serv.rpc.Call("StorageRPC.RemoveFromList", args, &reply)
 		
 		if (err != nil) {
 		  return 0, err
@@ -214,9 +216,9 @@ func (ss *Storageserver) RemoveFromList(key string, element []byte) (bool, os.Er
 func (ss *Storageserver) GetIndex(key string) (int) {
 	fields := strings.Split(key, ":")
 	user := fields[0]			
- 	h = New32()
+ 	h := fnv.New32()
 	h.Write([]byte(user))
 	
-	return (h.Sum32() % len(servers)) - 1
+	return (int(h.Sum32()) % len(ss.servers)) - 1
 }
 
