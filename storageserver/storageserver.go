@@ -2,6 +2,8 @@ package storageserver
 
 import (
 	"storageproto"
+	"hash/fnv"
+	"strings"
 	"rpc"
 	"storage"
 	"os"
@@ -116,14 +118,105 @@ func (ss *Storageserver) RemoveFromListRPC(args *storageproto.PutArgs, reply *st
 }
 
 
-func (ss *Storageserver) GET(key string) ([]byte, bool) {
+
+func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
+  index := ss.GetIndex(key)
+	serv := ss.servers[index]
+
+	//if local server call server tribmap
+	if serv.nodeid == ss.nodeid {
+		return ss.tm.GET(key), nil //can i do this? 
+
+	}else{
+		//if not, call correct server via rpc
+		args := &storageproto.GetArgs{key}
+		var reply tribproto.GetReply
+
+	 	err := serv.server.Call("StorageRPC.Get", args, &reply)
+		
+		if (err != nil) {
+				return nil, 0, err //is this the correct status for when err?
+		}
+			
+		return []byte(reply.Value), reply.Status, nil	
+	  }
 }
 
-func (ss *StorageServer) PUT(key string, val []byte) (bool) {
+func (ss *Storageserver) PUT(key string, val []byte) (bool, os.Error) {
+	index := ss.GetIndex(key)
+	serv := ss.servers[index]
+
+	//if local server call server tribmap
+	if serv.nodeid == ss.nodeid {
+		return ss.tm.PUT(key, val), nil      
+	
+	}else{
+		//if not, call correct server via rpc
+		args := &storageproto.PutArgs{key, string(val)}
+		var reply tribproto.PutReply
+		
+		err := serv.server.Call("StorageRPC.Put", args, &reply)
+		
+		if (err != nil) {
+		  return 0, err
+	  }
+	  
+		return reply.Status, nil
+	}
 }
 
-func (ss *StorageServer) AddToList(key string, element []byte) (os.Error) {
+func (ss *Storageserver) AddToList(key string, element []byte) (bool, os.Error) {
+	index := ss.GetIndex(key)
+	serv := ss.servers[index]
+
+	//if local server call server tribmap
+	if serv.nodeid == ss.nodeid {
+		return ss.tm.AddToList(key, element), nil      
+	
+	}else{
+		//if not, call correct server via rpc
+		args := &storageproto.PutArgs{key, string(element)}
+		var reply tribproto.PutReply
+	
+		err := serv.server.Call("StorageRPC.AppendToList", args, &reply)
+		
+		if (err != nil) {
+		  return 0, err
+	  }
+	  
+		return reply.Status, nil
+	}
 }
 
-func (ss *StorageServer) RemoveFromList(key string, element []byte) (os.Error) {
+func (ss *Storageserver) RemoveFromList(key string, element []byte) (bool, os.Error) {
+	index := ss.GetIndex(key)
+	serv := ss.servers[index]
+
+	//if local server call server tribmap
+	if serv.nodeid == ss.nodeid {
+		return ss.tm.RemoveFromList(key, element), nil      
+	
+	}else{
+		//if not, call correct server via rpc
+		args := &storageproto.PutArgs{key, string(value)}
+		var reply tribproto.PutReply
+
+		err := serv.server.Call("StorageRPC.RemoveFromList", args, &reply)
+		
+		if (err != nil) {
+		  return 0, err
+	  }
+	  
+		return reply.Status, nil
+	}
 }
+
+func (ss *Storageserver) GetIndex(key string) (int) {
+	fields := strings.Split(key, ":")
+	user := fields[0]			
+ 	h = New32()
+	h.Write([]byte(user))
+	
+	return (h.Sum32() % len(servers)) - 1
+}
+
