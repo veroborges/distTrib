@@ -7,7 +7,7 @@ import (
 	"tribproto"
 	"tribbleclient"
 	"os"
-	"../runjob/runjob"
+	"runjob"
 	"log"
 	"fmt"
 	"rand"

@@ -1,0 +1,345 @@
+package storageserver
+
+import (
+	"storageproto"
+	"os"
+	"json"
+	"log"
+	"sync"
+	"rpc"
+	"time"
+	"rand"
+	"net"
+	"fmt"
+	"hash/fnv"
+	"strings"
+)
+
+type Storageserver struct {
+	data map[string]string
+	lock *sync.Mutex
+	numnodes int
+	nodelist []storageproto.Client
+	ready bool
+	id uint32
+	clientcache map[string]*rpc.Client
+}
+
+func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *Storageserver {
+	if (nodeid == 0) {
+		rand.Seed(time.Nanoseconds())
+		nodeid = rand.Uint32()
+	}
+	ss := &Storageserver{make(map[string] string), &sync.Mutex{}, numnodes, nil, false, nodeid,
+		make(map[string] *rpc.Client)}
+	if (numnodes > 0) {
+		// I'm the master!  
+		ss.nodelist = make([]storageproto.Client, 0, numnodes)
+	}
+	// Even the master registers with itself - needs the list of hosts.
+	go ss.Register(master, nodeid, portnum)
+	return ss
+}
+
+func (ss *Storageserver) Register(master string, nodeid uint32, portnum int) {
+	// Loop and ping the master until it's happy.
+	args := &storageproto.RegisterArgs{ storageproto.Client{ net.JoinHostPort("localhost", fmt.Sprint(portnum)), nodeid} }
+	var reply storageproto.RegisterReply
+
+	for done := false; done != true; {
+		//log.Println("Trying to register with ", master)
+		client, err := rpc.DialHTTP("tcp", master)
+		if (err == nil) {
+			err = client.Call("StorageRPC.Register", args, &reply)
+			if (err == nil && reply.Ready == true) {
+				done = true
+				//log.Printf("Register complete")
+				if (ss.nodelist == nil || len(ss.nodelist) == 0) {
+					ss.nodelist = reply.Clients
+				}
+				//log.Println("Establishing RPC cache to nodes: ", ss.nodelist)
+				ss.lock.Lock() // Must hold lock to modify the client cache
+				defer ss.lock.Unlock()
+				for _, n := range ss.nodelist {
+					cli, err := rpc.DialHTTP("tcp", n.HostPort)
+					if (err != nil) {
+						log.Fatal("Could not connect to one of the storage servers:", err)
+					}
+					ss.clientcache[n.HostPort] = cli
+				}
+				log.Println("Successfully joined storage node cluster.")
+				log.Println("Server list: ", ss.nodelist)
+			}
+			client.Close()
+		}
+		if (!done) {
+			time.Sleep(1e9)
+		}
+	}
+}
+
+// Called by clients via RPC
+func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *storageproto.RegisterReply) os.Error {
+	//log.Println("Hey, cool, someone's registering: ", args.ClientInfo.HostPort, " as ID: ", args.ClientInfo.NodeID)
+	// Are they a new client?  If so, add them to the list of known clients
+	// If so, is the # of servers equal to the expected #?  If so, set ready and return the list.
+	newcli := args.ClientInfo
+	found := false
+	for _, cli := range ss.nodelist {
+		if (cli.HostPort == newcli.HostPort && cli.NodeID == newcli.NodeID) {
+			found = true
+		}
+	}
+	if (!found) {
+		nlen := len(ss.nodelist)
+		ss.nodelist = ss.nodelist[0:1+nlen]
+		ss.nodelist[nlen] = newcli
+		nnodes := nlen+1
+		if (nnodes == ss.numnodes) {
+			ss.ready = true
+		}
+	}
+	
+	
+	if (ss.ready) {
+		reply.Ready = true
+		reply.Clients = ss.nodelist
+	} else {
+		reply.Ready = false
+	}
+	return nil
+}
+
+// Local functions
+func (ss *Storageserver) Get(key string) (string, bool) {
+	args := &storageproto.GetArgs{key}
+	var reply storageproto.GetReply
+	err := ss.GetRPC(args, &reply)
+	if (err != nil || reply.Status != storageproto.OK) {
+		return "", false
+	}
+	return reply.Value, true
+}
+
+func (ss *Storageserver) Put(key, val string) int {
+	args := &storageproto.PutArgs{key, val}
+	var reply storageproto.PutReply
+	err := ss.PutRPC(args, &reply)
+	if (err != nil || reply.Status != storageproto.OK) {
+		return storageproto.EPUTFAILED
+	}
+	return storageproto.OK
+}
+func (ss *Storageserver) PutLocal(key, val string) {
+	ss.lock.Lock()
+	defer ss.lock.Unlock()
+
+	ss.data[key] = val
+}
+
+func (ss *Storageserver) GetList(key string) []string {
+	args := &storageproto.GetArgs{key}
+	var reply storageproto.GetListReply
+	err := ss.GetListRPC(args, &reply)
+	if (err != nil || reply.Status != storageproto.OK) {
+		return nil
+	}
+	return reply.Value
+}
+
+
+func (ss *Storageserver) RemoveFromList(key, removeitem string) int {
+	args := &storageproto.PutArgs{key, removeitem}
+	var reply storageproto.PutReply
+	err := ss.RemoveFromListRPC(args, &reply)
+	if (err != nil) {
+		return storageproto.EPUTFAILED
+	}
+	return reply.Status
+}
+
+func (ss *Storageserver) AppendToList(key, newitem string) {
+	args := &storageproto.PutArgs{key, newitem}
+	var reply storageproto.PutReply
+	_ = ss.AppendToListRPC(args, &reply) // sigh
+}
+
+func (ss *Storageserver) AppendToListLocal(key, newitem string) {
+	ss.lock.Lock()
+	defer ss.lock.Unlock()
+	
+	strlist := ss.GetListLocalUnlocked(key) // sigh.
+
+	l := 0
+	if (strlist == nil) {
+		strlist = make([]string, 1)
+	} else {
+		l = len(strlist)
+		// append to strlist
+		if (cap(strlist) == l) {
+			ns := make([]string, l+1)
+			copy(ns, strlist)
+			strlist = ns
+		}
+	}
+	strlist = strlist[0:l+1]
+	strlist[l] = newitem
+	fjson, _ := json.Marshal(strlist)
+	ss.data[key] = string(fjson)
+}
+
+// Local data structure access
+func (ss *Storageserver) GetLocal(key string) (string, bool) {
+	ss.lock.Lock()
+	defer ss.lock.Unlock()
+
+	d, p := ss.data[key]
+	return d, p
+}
+
+func (ss *Storageserver) GetListLocal(key string) []string {
+	ss.lock.Lock()
+	defer ss.lock.Unlock()
+
+	return ss.GetListLocalUnlocked(key)
+}
+
+func (ss *Storageserver) GetListLocalUnlocked(key string) []string {
+	dstr, present := ss.data[key]
+	if (!present || len(dstr) == 0) {
+		return nil
+	}
+	var strlist []string
+	err := json.Unmarshal([]byte(dstr), &strlist)
+	if (err != nil) {
+		log.Println("Could not unmarshal json list:", err)
+		log.Println("Data was: ", dstr)
+		return nil
+	}
+	return strlist
+}
+
+func (ss *Storageserver) RemoveFromListLocal(key, removeitem string) int {
+	ss.lock.Lock()
+	defer ss.lock.Unlock()
+
+	strlist := ss.GetListLocalUnlocked(key)
+	if (strlist == nil) {
+		return storageproto.EITEMNOTFOUND
+	}
+	nlist := make([]string, len(strlist))
+	npos := 0
+	for _, item := range strlist {
+		if (item != removeitem) {
+			nlist[npos] = item
+			npos++
+		}
+	}
+	ljson, _ := json.Marshal(nlist)
+	ss.data[key] = string(ljson)
+	return storageproto.OK
+}
+
+// Partitioning
+
+func hashkey(key string) uint32 {
+	hasher := fnv.New32()
+	hasher.Write([]byte(key))
+	return hasher.Sum32()
+}
+
+func (ss *Storageserver) check_dispatch(key string) (bool, *rpc.Client) {
+	precolon := strings.Split(key, ":")[0]
+	keyid := hashkey(precolon)
+	best_cli := ss.nodelist[0]
+	best_cli_dist := uint32(best_cli.NodeID - keyid)
+	for _, cli := range ss.nodelist {
+		dist := uint32(cli.NodeID - keyid)
+		if (dist < best_cli_dist) {
+			best_cli = cli
+			best_cli_dist = dist
+		}
+	}
+	//log.Println("Key: ", key, " hash: ", keyid)
+	if (best_cli.NodeID == ss.id) {
+		//log.Println("Handling key ", key, " locally")
+		// It's me!  It's me!
+		return true, nil
+	}
+	//log.Println("Dispatching key ", key, " to node ", best_cli.HostPort)
+	rpc_client, _ := ss.clientcache[best_cli.HostPort]
+	return false, rpc_client
+}
+
+// RPC-able interfaces, bridged via StorageRPC.
+// These should do something! :-)
+
+func (ss *Storageserver) GetRPC(args *storageproto.GetArgs, reply *storageproto.GetReply) os.Error {
+	isLocal, theServer := ss.check_dispatch(args.Key)
+	if (isLocal) {
+		val, present := ss.GetLocal(args.Key)
+		if (present) {
+			reply.Status = storageproto.OK
+			reply.Value = val
+		} else {
+			reply.Status = storageproto.EKEYNOTFOUND
+		}
+		return nil
+	} else {
+		return theServer.Call("StorageRPC.Get", args, reply)
+	}
+	return nil
+}
+
+func (ss *Storageserver) GetListRPC(args *storageproto.GetArgs, reply *storageproto.GetListReply) os.Error {
+	isLocal, theServer := ss.check_dispatch(args.Key)
+	if (isLocal) {
+		val := ss.GetListLocal(args.Key)
+		if (val != nil) {
+			reply.Status = storageproto.OK
+			reply.Value = val
+		} else {
+			reply.Status = storageproto.EKEYNOTFOUND
+		}
+		return nil
+	} else {
+		return theServer.Call("StorageRPC.GetList", args, reply)
+	}
+	return nil
+}
+
+func (ss *Storageserver) PutRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
+	isLocal, theServer := ss.check_dispatch(args.Key)
+	if (isLocal) {
+		ss.PutLocal(args.Key, args.Value)
+		reply.Status = storageproto.OK
+		return nil
+	} else {
+		return theServer.Call("StorageRPC.Put", args, reply)
+	}
+	return nil
+}
+
+func (ss *Storageserver) AppendToListRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
+	isLocal, theServer := ss.check_dispatch(args.Key)
+	if (isLocal) {
+		ss.AppendToListLocal(args.Key, args.Value)
+		reply.Status = storageproto.OK
+		return nil
+	} else {
+		return theServer.Call("StorageRPC.AppendToList", args, reply)
+	}
+	return nil
+}
+
+func (ss *Storageserver) RemoveFromListRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
+	isLocal, theServer := ss.check_dispatch(args.Key)
+	if (isLocal) {
+		reply.Status = ss.RemoveFromListLocal(args.Key, args.Value)
+		return nil
+	} else {
+		return theServer.Call("StorageRPC.RemoveFromList", args, reply)
+	}
+	return nil
+}
+

@@ -24,7 +24,8 @@ const (
 )
 
 var portnum *int = flag.Int("port", 9009, "server port # to connect to")
-var host *string = flag.String("host", "localhost", "server hostname")
+var serverAddress *string = flag.String("host", "localhost", "server host to connect to")
+
 
 func main() {
 
@@ -35,9 +36,8 @@ func main() {
 
 	cmd := flag.Arg(0)
 	
-	serverAddress := *host
 	serverPort := fmt.Sprintf("%d", *portnum)
-	client, _ := tribbleclient.NewTribbleclient(serverAddress, serverPort)
+	client, _ := tribbleclient.NewTribbleclient(*serverAddress, serverPort)
 
 	cmdlist := []cmd_info {
 		{ "uc", "Tribserver.CreateUser", 1 },
@@ -122,8 +122,8 @@ func PrintStatus(cmdname string, status int, err os.Error) {
 
 func PrintTribble(t tribproto.Tribble) {
 	fmt.Printf("%16.16s - %s - %s\n",
-		t.Userid, time.SecondsToLocalTime(t.Posted / 1e9), t.Contents)
-
+		t.Userid, time.SecondsToLocalTime(t.Posted/10e9), t.Contents)
+		
 }
 
 func PrintTribbles(tribbles []tribproto.Tribble) {
