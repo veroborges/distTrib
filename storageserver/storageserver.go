@@ -32,7 +32,7 @@ func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *
 	ss := &Storageserver{storage.NewTribMap(), nil, numnodes, nodeid, nil}
 	var lock sync.Mutex
 	ss.cond = sync.NewCond(&lock)
-	socket := net.JoinHostPort(master, fmt.Sprintf("%d", portnum))
+	socket := master
 	if (numnodes == 0) {
 		for {
 			master, err := rpc.DialHTTP("tcp", socket)
@@ -62,7 +62,8 @@ func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *
 		}
 	} else {
 		ss.servers = make([]serverData, numnodes)
-		ss.servers[numnodes - 1] = serverData{nil, storageproto.Client{"", nodeid}}
+		socket := fmt.Sprintf("localhost:%d", portnum)
+		ss.servers[numnodes - 1] = serverData{nil, storageproto.Client{socket, nodeid}}
 		numnodes--
 	}
 	return ss
