@@ -138,7 +138,7 @@ func (ss *Storageserver) PutRPC(args *storageproto.PutArgs, reply *storageproto.
 }
 
 func (ss *Storageserver) AppendToListRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
-	err := ss.tm.AddToList(args.Key, byte[](args.Value))
+	err := ss.tm.AddToList(args.Key, []byte(args.Value))
 	if (err == nil) {
 		reply.Status = storageproto.OK
 	} else {
@@ -148,7 +148,7 @@ func (ss *Storageserver) AppendToListRPC(args *storageproto.PutArgs, reply *stor
 }
 
 func (ss *Storageserver) RemoveFromListRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
-	err, ok := ss.tm.RemoveFromList(args.Key, byte[](args.Value))
+	err, ok := ss.tm.RemoveFromList(args.Key, []byte(args.Value))
 	if (err != nil || !ok) {
 		reply.Status = storageproto.EITEMNOTFOUND
 	} else {
