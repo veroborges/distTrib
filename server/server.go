@@ -23,7 +23,7 @@ const LAST string = ":last"
 
 
 type Tribserver struct {
-	tm *storage.TribMap
+	tm *storage.TribMap // Reference to the storage system
 }
 
 func NewTribserver() *Tribserver {
@@ -36,11 +36,11 @@ func (ts *Tribserver) CreateUser(args *tribproto.CreateUserArgs, reply *tribprot
 	if _, present := ts.tm.GET(args.Userid + LAST); present{
 			reply.Status = tribproto.EEXISTS
 	} else {
-			//initialize the 3 maps for the user
+			//initialize the 2 maps for the user
 			val, _ := json.Marshal(0)
-			ts.tm.PUT(args.Userid + LAST, val)
+			ts.tm.PUT(args.Userid + LAST, val) // the count to zero
 			val, _ = json.Marshal(make(map[string] bool))
-			ts.tm.PUT(args.Userid + SUBSCRIPTIONS, val)
+			ts.tm.PUT(args.Userid + SUBSCRIPTIONS, val) // set the subscriptions to an empty set
 	}
 	return nil
 }
@@ -56,6 +56,7 @@ func (ts *Tribserver) AddSubscription(args *tribproto.SubscriptionArgs, reply *t
 			if (err != nil) {
 				return err
 			}
+			// add the target user to the subscriptions
 			ts.tm.AddToList(args.Userid + SUBSCRIPTIONS, val)
 		} else {
 			reply.Status = tribproto.ENOSUCHTARGETUSER
@@ -75,6 +76,7 @@ func (ts *Tribserver) RemoveSubscription(args *tribproto.SubscriptionArgs, reply
 			if (err != nil) {
 				return err
 			}
+			// Remove the target user from the subscriptions
 			ts.tm.RemoveFromList(args.Userid + SUBSCRIPTIONS, val)
 		} else {
 			reply.Status = tribproto.ENOSUCHTARGETUSER
@@ -94,6 +96,7 @@ func (ts *Tribserver) GetSubscriptions(args *tribproto.GetSubscriptionsArgs, rep
 		}
 		reply.Userids = make([]string, len(subscribers))
 		i:=0
+		// Read all subscriptions of the user
 		for key, _ := range subscribers{
 			reply.Userids[i] = key
 			i++
@@ -109,7 +112,7 @@ func (ts *Tribserver) PostTribble(args *tribproto.PostTribbleArgs, reply *tribpr
 	if lastJson, present := ts.tm.GET(args.Userid + LAST); present{ 
 		 last := new(int)
 		 json.Unmarshal(lastJson, last)
-		 *last++
+		 *last++ // get last trib id and increment it
 		 lastStr := fmt.Sprintf(":%d", *last)
 
 		 tribble := new(tribproto.Tribble)
@@ -117,17 +120,16 @@ func (ts *Tribserver) PostTribble(args *tribproto.PostTribbleArgs, reply *tribpr
 		 tribble.Posted = time.Nanoseconds()
 		 tribble.Contents = args.Contents
 
-		 //tm.PUT(args.Userid + ":tribbles", json.Marshal(tribble.Userid))
 		 val, err := json.Marshal(tribble)
 		if (err != nil) {
 			return err
 		}
-		ts.tm.PUT(args.Userid + lastStr, val)
+		ts.tm.PUT(args.Userid + lastStr, val) // store the tribble with new trib id
 		val, err = json.Marshal(*last)
 		if (err != nil) {
 			return err
 		}
-		ts.tm.PUT(args.Userid + LAST, val)
+		ts.tm.PUT(args.Userid + LAST, val) // increment the last trib id
 	} else {
 		reply.Status = tribproto.ENOSUCHUSER
 	}
@@ -142,12 +144,12 @@ func (ts *Tribserver) GetTribbles(args *tribproto.GetTribblesArgs, reply *tribpr
 			return err
 		}
 		size := *last
-		if (size > 100) {
+		if (size > 100) { // read at most 100 messages
 			size = 100
 		}
 		reply.Tribbles = make([]tribproto.Tribble, size)
 		for i := 0; i < size; i++ {
-			tribbleId := fmt.Sprintf("%s:%d", args.Userid, *last)
+			tribbleId := fmt.Sprintf("%s:%d", args.Userid, *last) // get latest message
 			if tribJson, present := ts.tm.GET(tribbleId); present {
 				trib := new(tribproto.Tribble)
 				err := json.Unmarshal(tribJson, trib)
@@ -156,7 +158,7 @@ func (ts *Tribserver) GetTribbles(args *tribproto.GetTribblesArgs, reply *tribpr
 				}
 				reply.Tribbles[i] = *trib
 			}
-			*last--
+			*last-- // decremeent last
 		}
 	}else{
 		reply.Status = tribproto.ENOSUCHUSER
@@ -168,54 +170,45 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 	if suscribJson, present := ts.tm.GET(args.Userid + SUBSCRIPTIONS); present{
 		suscribers := make(map [string] bool)
 		json.Unmarshal(suscribJson, &suscribers)
-		recentTribs := vector.Vector(make([]interface{},0, 100))
-		heap.Init(&recentTribs)
+		recentTribs := vector.Vector(make([]interface{},0, 100)) // create a vector with at most 100 elements
+		heap.Init(&recentTribs) //convert it to a min heap
 		level := 0
-		hasTribs := false
-		log.Printf("sub len %d", len(suscribers))
-		for recentTribs.Len() < 100 {
+		hasTribs := true
+		for recentTribs.Len() < 100 && hasTribs { // loop until we get 100 tribs or there are no more subcribers with tribs left
 			hasTribs = false
 			for subscriber, _ := range suscribers  {
-				log.Printf("get r %s", subscriber + LAST)
 				lastJson, _ := ts.tm.GET(subscriber + LAST)
-				log.Printf("last %s", string(lastJson))
 				last := new(int)
 				err := json.Unmarshal(lastJson, last)
 				if (err != nil) {
 					return err
 				}
-				*last -=level
+				*last -=level // get last n-th message for each subscriber
 				tribbleId := fmt.Sprintf("%s:%d", subscriber, *last)
-				log.Printf("%s", tribbleId)
 				if (*last > 0) {
-					hasTribs = true
+					hasTribs = true // we found a subscriber that has at least one message
 					if tribJson, present := ts.tm.GET(tribbleId); present {
-						log.Printf("%s %s", tribbleId, tribJson)
 						trib := new(tribproto.Tribble)
 						err = json.Unmarshal(tribJson, trib)
 						if (err != nil) {
 							return err
 						}
+						// if the heap has more than 100 elements, include only if the tribble is posted after the root
+						// to ensure that the heap only contains 100 latest messages
 						if recentTribs.Len() >= 100 && recentTribs[0].(tribproto.Tribble).Posted < trib.Posted {
-							log.Printf("poping and pushing")
-							heap.Pop(&recentTribs)
+							heap.Pop(&recentTribs) // throway the trib at the root
 							heap.Push(&recentTribs, trib)
-						}else if recentTribs.Len() < 100{
-							log.Printf("pushing")
+						}else if recentTribs.Len() < 100{ // we have less than 100 elements, just stick it into the heap
 							heap.Push(&recentTribs, trib)
 						}
 					}
 				}
 			}
-			level++
-			if (!hasTribs) {
-				break
-			}
+			level++ // increment the level in order to look at the next message from the end
 		}
 		reply.Tribbles = make([]tribproto.Tribble, recentTribs.Len())
-		log.Printf("Len %d", recentTribs.Len())
 		for i:=recentTribs.Len() - 1; i >=0; i-- {
-			reply.Tribbles[i] = *(heap.Pop(&recentTribs).(*tribproto.Tribble))
+			reply.Tribbles[i] = *(heap.Pop(&recentTribs).(*tribproto.Tribble)) // return tribbles in reverse chronological order
 		}
 	} else {
 		reply.Status = tribproto.ENOSUCHUSER
