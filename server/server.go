@@ -19,8 +19,6 @@ import (
 const SUBSCRIPTIONS string = ":subscriptions"
 const LAST string = ":last"
 
-
-
 func (ts *Tribserver) CreateUser(args *tribproto.CreateUserArgs, reply *tribproto.CreateUserReply) os.Error {
 	//if a map fot that user exists (present is true) return EEXISTS
 	if _, present := ts.tm.GET(args.Userid + LAST); present{
