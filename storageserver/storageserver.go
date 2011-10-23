@@ -9,7 +9,6 @@ import (
 	"os"
 	"time"
 	"sync"
-	"net"
 	"log"
 	"fmt"
 	"json"
@@ -29,15 +28,15 @@ type serverData struct {
 }
 
 func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *Storageserver {
-	ss := &Storageserver{storage.NewTribMap(), nil, numnodes, nodeid, nil}
+	ss := &Storageserver{storage.NewTribMap(), nil, numnodes, nodeid, sync.NewCond(&sync.Mutex{})}
 	var lock sync.Mutex
 	ss.cond = sync.NewCond(&lock)
-	socket := master
+	socket := fmt.Sprintf("localhost:%d", portnum)
 	if (numnodes == 0) {
 		for {
-			master, err := rpc.DialHTTP("tcp", socket)
+			master, err := rpc.DialHTTP("tcp", master)
 			if err != nil {
-				log.Printf("Failed to connect to the master; retrying")
+				log.Printf("Failed to connect to the master; retrying: %s", err.String())
 				time.Sleep(1000000000)
 			} else {
 				reply := new(storageproto.RegisterReply)
@@ -62,7 +61,6 @@ func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *
 		}
 	} else {
 		ss.servers = make([]serverData, numnodes)
-		socket := fmt.Sprintf("localhost:%d", portnum)
 		ss.servers[numnodes - 1] = serverData{nil, storageproto.Client{socket, nodeid}}
 		numnodes--
 	}
@@ -83,10 +81,15 @@ func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *sto
 	var err os.Error
 	if (ss.numnodes > 0) {
 		ss.servers[ss.numnodes - 1].clientInfo = args.ClientInfo
-		ss.servers[ss.numnodes - 1].rpc, err = rpc.DialHTTP("tcp", ss.servers[ss.numnodes -1].clientInfo.HostPort)
-                if err != nil {
-                        log.Fatal("Problem creating rpc connection to %s", ss.servers[ss.numnodes - 1].clientInfo.HostPort)
-                }
+		for {
+			ss.servers[ss.numnodes - 1].rpc, err = rpc.DialHTTP("tcp", ss.servers[ss.numnodes -1].clientInfo.HostPort)
+                	if err != nil {
+                        	log.Fatal("Problem creating rpc connection; retrying", ss.servers[ss.numnodes - 1].clientInfo.HostPort)
+               	 	} else {
+				break
+			}
+			time.Sleep(1000000000)
+		}
 
 		ss.numnodes--
 	} else if (ss.numnodes == 0) {
