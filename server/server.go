@@ -11,6 +11,7 @@ import (
 	"flag"
 	"json"
 	"time"
+	"rand"
 	"container/vector"
 	"container/heap"
 	"storageproto"
@@ -281,15 +282,23 @@ var nodeID *uint = flag.Uint("id", 0, "The node ID to use for consistent hashing
 func main() {
 	flag.Parse()
 	log.Printf("Server starting on port %d\n", *portnum);
+	if *nodeID ==0 {
+		rand.Seed(time.Nanoseconds())
+		*nodeID = uint(rand.Uint32())
+	}
 	ss := storageserver.NewStorageserver(*storageMasterNodePort, *numNodes, *portnum, uint32(*nodeID))
 	ts := NewTribserver(ss)
 	rpc.Register(ts)
 	srpc := storagerpc.NewStorageRPC(ss)
 	rpc.Register(srpc)
 	rpc.HandleHTTP()
+	log.Printf("123123")
 	l, e := net.Listen("tcp", fmt.Sprintf(":%d", *portnum))
 	if e != nil {
 		log.Fatal("listen error:", e)
 	}
+	log.Printf("123")
+	log.Printf("Establishing connection with storage servers")
+	go ss.Connect(l.Addr())
 	http.Serve(l, nil)
 }

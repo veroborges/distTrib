@@ -10,7 +10,7 @@ import (
 	"time"
 	"sync"
 	"log"
-	"fmt"
+	"net"
 	"json"
 )
 
@@ -20,6 +20,7 @@ type Storageserver struct {
 	numnodes int
 	nodeid uint32
 	cond *sync.Cond
+	master string
 }
 
 type serverData struct {
@@ -28,31 +29,27 @@ type serverData struct {
 }
 
 func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *Storageserver {
-	ss := &Storageserver{storage.NewTribMap(), nil, numnodes, nodeid, sync.NewCond(&sync.Mutex{})}
-	var lock sync.Mutex
-	ss.cond = sync.NewCond(&lock)
-	socket := fmt.Sprintf("localhost:%d", portnum)
-	if (numnodes == 0) {
+	ss := &Storageserver{storage.NewTribMap(), nil, numnodes, nodeid, sync.NewCond(&sync.Mutex{}), master}
+	return ss
+}
+
+func (ss *Storageserver) Connect(addr net.Addr) {
+	if (ss.numnodes == 0) {
+		log.Printf("Connecting as slave")
 		for {
-			master, err := rpc.DialHTTP("tcp", master)
+			master, err := rpc.DialHTTP("tcp", ss.master)
 			if err != nil {
 				log.Printf("Failed to connect to the master; retrying: %s", err.String())
 				time.Sleep(1000000000)
 			} else {
 				reply := new(storageproto.RegisterReply)
-				err = master.Call("StorageRPC.Register",&storageproto.RegisterArgs{storageproto.Client{socket, nodeid}}, reply)
+				err = master.Call("StorageRPC.Register",&storageproto.RegisterArgs{storageproto.Client{addr.String(), ss.nodeid}}, reply)
 				if (err != nil) {
 					log.Printf("Something went wrong with the call; retrying")
 				} else if reply.Ready {
 					ss.servers = make([]serverData, len(reply.Clients))
 					for i:=0; i < len(reply.Clients); i++ {
 						ss.servers[i] = serverData{nil, reply.Clients[i]}
-						if (ss.servers[i].clientInfo.NodeID != ss.nodeid) {
-							ss.servers[i].rpc, err = rpc.DialHTTP("tcp", ss.servers[i].clientInfo.HostPort)
-							if (err != nil) {
-								log.Fatal("Problem making rpc connection")
-							}
-						}
 					}
 					break
 				}
@@ -60,11 +57,33 @@ func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *
 			}
 		}
 	} else {
-		ss.servers = make([]serverData, numnodes)
-		ss.servers[numnodes - 1] = serverData{nil, storageproto.Client{socket, nodeid}}
-		numnodes--
+		ss.servers = make([]serverData, ss.numnodes)
+		ss.servers[ss.numnodes - 1] = serverData{nil, storageproto.Client{addr.String(), ss.nodeid}}
+		ss.numnodes--
 	}
-	return ss
+	ss.cond.L.Lock()
+	log.Printf("connecting to other servers")
+	for ss.numnodes > 0 {
+		ss.cond.Wait()
+	}
+	for i:=0; i < len(ss.servers); i++ {
+		server := ss.servers[i]
+		if server.clientInfo.NodeID == ss.nodeid {
+			continue
+		}
+		for {
+			rpc, err := rpc.DialHTTP("tcp", server.clientInfo.HostPort)
+			if (err != nil) {
+				log.Printf("Problem making rpc connection")
+			} else {
+				server.rpc = rpc
+				log.Printf("Made connection to %s", server.clientInfo.HostPort)
+				break;
+			}
+			time.Sleep(1000000000)
+		}
+        }
+	ss.cond.L.Unlock()
 }
 
 // You might define here the functions that the locally-linked application
@@ -78,27 +97,22 @@ func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *
 
 func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *storageproto.RegisterReply) os.Error {
 	reply.Ready = false
-	var err os.Error
+	ss.cond.L.Lock()
+	log.Printf("Registration from %s", args.ClientInfo.HostPort)
 	if (ss.numnodes > 0) {
 		ss.servers[ss.numnodes - 1].clientInfo = args.ClientInfo
-		for {
-			ss.servers[ss.numnodes - 1].rpc, err = rpc.DialHTTP("tcp", ss.servers[ss.numnodes -1].clientInfo.HostPort)
-                	if err != nil {
-                        	log.Fatal("Problem creating rpc connection; retrying", ss.servers[ss.numnodes - 1].clientInfo.HostPort)
-               	 	} else {
-				break
-			}
-			time.Sleep(1000000000)
-		}
-
 		ss.numnodes--
-	} else if (ss.numnodes == 0) {
+	}
+	if (ss.numnodes == 0) {
 		reply.Ready = true
 		reply.Clients = make([]storageproto.Client, len(ss.servers))
 		for i:=0; i < len(ss.servers); i++ {
 			reply.Clients[i] = ss.servers[i].clientInfo
 		}
+		ss.cond.Broadcast()
 	}
+	log.Printf("numnodes %d", ss.numnodes)
+	ss.cond.L.Unlock()
 	return nil
 }
 
