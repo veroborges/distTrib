@@ -12,11 +12,13 @@ import (
 	"log"
 	"net"
 	"json"
+	"container/vector"
+	"sort"
 )
 
 type Storageserver struct {
 	tm *storage.TribMap
-	servers []serverData
+	servers []interface{}
 	numnodes int
 	nodeid uint32
 	cond *sync.Cond
@@ -47,7 +49,7 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 				if (err != nil) {
 					log.Printf("Something went wrong with the call; retrying")
 				} else if reply.Ready {
-					ss.servers = make([]serverData, len(reply.Clients))
+					ss.servers = make([]interface{}, len(reply.Clients))
 					for i:=0; i < len(reply.Clients); i++ {
 						ss.servers[i] = serverData{nil, reply.Clients[i]}
 					}
@@ -57,7 +59,7 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 			}
 		}
 	} else {
-		ss.servers = make([]serverData, ss.numnodes)
+		ss.servers = make([]interface{}, ss.numnodes)
 		ss.servers[ss.numnodes - 1] = serverData{nil, storageproto.Client{addr.String(), ss.nodeid}}
 		ss.numnodes--
 	}
@@ -67,7 +69,7 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 		ss.cond.Wait()
 	}
 	for i:=0; i < len(ss.servers); i++ {
-		server := ss.servers[i]
+		server := ss.servers[i].(serverData)
 		if server.clientInfo.NodeID == ss.nodeid {
 			continue
 		}
@@ -82,7 +84,8 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 			}
 			time.Sleep(1000000000)
 		}
-        }
+    }
+	ss.sortServers()
 	ss.cond.L.Unlock()
 }
 
@@ -100,14 +103,15 @@ func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *sto
 	ss.cond.L.Lock()
 	log.Printf("Registration from %s", args.ClientInfo.HostPort)
 	if (ss.numnodes > 0) {
-		ss.servers[ss.numnodes - 1].clientInfo = args.ClientInfo
+		server := ss.servers[ss.numnodes - 1].(serverData)
+		server.clientInfo = args.ClientInfo
 		ss.numnodes--
 	}
 	if (ss.numnodes == 0) {
 		reply.Ready = true
 		reply.Clients = make([]storageproto.Client, len(ss.servers))
 		for i:=0; i < len(ss.servers); i++ {
-			reply.Clients[i] = ss.servers[i].clientInfo
+			reply.Clients[i] = ss.servers[i].(serverData).clientInfo
 		}
 		ss.cond.Broadcast()
 	}
@@ -165,7 +169,7 @@ func (ss *Storageserver) RemoveFromListRPC(args *storageproto.PutArgs, reply *st
 
 func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
   	index := ss.GetIndex(key)
-	serv := ss.servers[index]
+	serv := ss.servers[index].(serverData)
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeid {
@@ -184,7 +188,7 @@ func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
 
 func (ss *Storageserver) PUT(key string, val []byte) (int, os.Error) {
 	index := ss.GetIndex(key)
-	serv := ss.servers[index]
+	serv := ss.servers[index].(serverData)
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeid {
@@ -202,7 +206,7 @@ func (ss *Storageserver) PUT(key string, val []byte) (int, os.Error) {
 
 func (ss *Storageserver) AddToList(key string, element []byte) (int, os.Error) {
 	index := ss.GetIndex(key)
-	serv := ss.servers[index]
+	serv := ss.servers[index].(serverData)
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeid {
@@ -220,7 +224,7 @@ func (ss *Storageserver) AddToList(key string, element []byte) (int, os.Error) {
 
 func (ss *Storageserver) RemoveFromList(key string, element []byte) (int, os.Error) {
 	index := ss.GetIndex(key)
-	serv := ss.servers[index]
+	serv := ss.servers[index].(serverData)
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeid {
@@ -241,6 +245,15 @@ func (ss *Storageserver) GetIndex(key string) (int) {
 	user := fields[0]
 	h := fnv.New32()
 	h.Write([]byte(user))
-	return int(h.Sum32()) % len(ss.servers)
+	hash := h.Sum32()
+	pos := sort.Search(len(ss.servers), func(i int) bool { 
+		return ss.servers[i].(serverData).clientInfo.NodeID >= hash 
+	})
+	return pos  % len(ss.servers)
+}
+
+func (ss *Storageserver) sortServers() {
+	v := vector.Vector(ss.servers)
+	sort.Sort(&v)
 }
 
