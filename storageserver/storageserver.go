@@ -30,6 +30,11 @@ type serverData struct {
 	clientInfo storageproto.Client
 }
 
+func (c *serverData) Less(y interface{}) bool {
+        return c.clientInfo.NodeID < y.(*serverData).clientInfo.NodeID
+}
+
+
 func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *Storageserver {
 	ss := &Storageserver{storage.NewTribMap(), nil, numnodes, nodeid, sync.NewCond(&sync.Mutex{}), master}
 	return ss
@@ -51,7 +56,7 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 				} else if reply.Ready {
 					ss.servers = make([]interface{}, len(reply.Clients))
 					for i:=0; i < len(reply.Clients); i++ {
-						ss.servers[i] = serverData{nil, reply.Clients[i]}
+						ss.servers[i] = &serverData{nil, reply.Clients[i]}
 					}
 					break
 				}
@@ -60,7 +65,7 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 		}
 	} else {
 		ss.servers = make([]interface{}, ss.numnodes)
-		ss.servers[ss.numnodes - 1] = serverData{nil, storageproto.Client{addr.String(), ss.nodeid}}
+		ss.servers[ss.numnodes - 1] = &serverData{nil, storageproto.Client{addr.String(), ss.nodeid}}
 		ss.numnodes--
 	}
 	ss.cond.L.Lock()
@@ -69,7 +74,7 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 		ss.cond.Wait()
 	}
 	for i:=0; i < len(ss.servers); i++ {
-		server := ss.servers[i].(serverData)
+		server := ss.servers[i].(*serverData)
 		if server.clientInfo.NodeID == ss.nodeid {
 			continue
 		}
@@ -103,19 +108,19 @@ func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *sto
 	ss.cond.L.Lock()
 	log.Printf("Registration from %s", args.ClientInfo.HostPort)
 	if (ss.numnodes > 0) {
-		server := ss.servers[ss.numnodes - 1].(serverData)
+		server := &serverData{}
 		server.clientInfo = args.ClientInfo
+		ss.servers[ss.numnodes - 1] = server
 		ss.numnodes--
 	}
 	if (ss.numnodes == 0) {
 		reply.Ready = true
 		reply.Clients = make([]storageproto.Client, len(ss.servers))
 		for i:=0; i < len(ss.servers); i++ {
-			reply.Clients[i] = ss.servers[i].(serverData).clientInfo
+			reply.Clients[i] = ss.servers[i].(*serverData).clientInfo
 		}
 		ss.cond.Broadcast()
 	}
-	log.Printf("numnodes %d", ss.numnodes)
 	ss.cond.L.Unlock()
 	return nil
 }
@@ -169,8 +174,7 @@ func (ss *Storageserver) RemoveFromListRPC(args *storageproto.PutArgs, reply *st
 
 func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
   	index := ss.GetIndex(key)
-	serv := ss.servers[index].(serverData)
-
+	serv := ss.servers[index].(*serverData)
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeid {
 		res, stat := ss.tm.GET(key)
@@ -178,8 +182,8 @@ func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
 	}
 	//if not, call correct server via rpc
 	args := &storageproto.GetArgs{key}
-	var reply storageproto.GetReply
-	err := serv.rpc.Call("StorageRPC.Get", args, &reply)
+	reply := new(storageproto.GetReply)
+	err := serv.rpc.Call("StorageRPC.Get", args, reply)
 	if (err != nil) {
 		return nil, 0, err
 	}
@@ -188,7 +192,7 @@ func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
 
 func (ss *Storageserver) PUT(key string, val []byte) (int, os.Error) {
 	index := ss.GetIndex(key)
-	serv := ss.servers[index].(serverData)
+	serv := ss.servers[index].(*serverData)
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeid {
@@ -206,7 +210,7 @@ func (ss *Storageserver) PUT(key string, val []byte) (int, os.Error) {
 
 func (ss *Storageserver) AddToList(key string, element []byte) (int, os.Error) {
 	index := ss.GetIndex(key)
-	serv := ss.servers[index].(serverData)
+	serv := ss.servers[index].(*serverData)
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeid {
@@ -224,7 +228,7 @@ func (ss *Storageserver) AddToList(key string, element []byte) (int, os.Error) {
 
 func (ss *Storageserver) RemoveFromList(key string, element []byte) (int, os.Error) {
 	index := ss.GetIndex(key)
-	serv := ss.servers[index].(serverData)
+	serv := ss.servers[index].(*serverData)
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeid {
@@ -247,7 +251,7 @@ func (ss *Storageserver) GetIndex(key string) (int) {
 	h.Write([]byte(user))
 	hash := h.Sum32()
 	pos := sort.Search(len(ss.servers), func(i int) bool { 
-		return ss.servers[i].(serverData).clientInfo.NodeID >= hash 
+		return ss.servers[i].(*serverData).clientInfo.NodeID >= hash 
 	})
 	return pos  % len(ss.servers)
 }

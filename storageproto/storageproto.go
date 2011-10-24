@@ -37,10 +37,6 @@ type Client struct {
 	NodeID uint32
 }
 
-func (c Client) Less(y interface{}) bool {
-        return c.NodeID < y.(Client).NodeID
-}
-
 type RegisterArgs struct {
 	ClientInfo Client
 }

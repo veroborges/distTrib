@@ -205,16 +205,13 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 		heap.Init(&recentTribs)
 		level := 0
 		hasTribs := false
-		log.Printf("sub len %d", len(suscribers))
 		for recentTribs.Len() < 100 {
 			hasTribs = false
 			for subscriber, _ := range suscribers  {
-				log.Printf("get r %s", subscriber + LAST)
 				lastJson, _, err := ts.tm.GET(subscriber + LAST)
 				if err != nil{
 					return err
 				}
-				log.Printf("last %s", string(lastJson))
 				last := new(int)
 				err = json.Unmarshal(lastJson, last)
 				if (err != nil) {
@@ -222,7 +219,6 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 				}
 				*last -=level
 				tribbleId := fmt.Sprintf("%s:%d", subscriber, *last)
-				log.Printf("%s", tribbleId)
 				if (*last > 0) {
 					hasTribs = true
 					tribJson, stat, err := ts.tm.GET(tribbleId)
@@ -230,7 +226,6 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 						return err
 					}
 					if stat == storageproto.OK {
-						log.Printf("%s %s", tribbleId, tribJson)
 						trib := new(tribproto.Tribble)
 						err = json.Unmarshal(tribJson, trib)
 						if (err != nil) {
@@ -253,7 +248,6 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 			}
 		}
 		reply.Tribbles = make([]tribproto.Tribble, recentTribs.Len())
-		log.Printf("Len %d", recentTribs.Len())
 		for i:=recentTribs.Len() - 1; i >=0; i-- {
 			reply.Tribbles[i] = *(heap.Pop(&recentTribs).(*tribproto.Tribble))
 		}
@@ -276,7 +270,7 @@ func NewTribserver(ss *storageserver.Storageserver) *Tribserver {
 
 var portnum *int = flag.Int("port", 9009, "port # to listen on")
 var storageMasterNodePort *string = flag.String("master", "localhost:9009", "Storage master node")
-var numNodes *int = flag.Int("N", 1, "Become the master.  Specifies the number of nodes in the system, including the master")
+var numNodes *int = flag.Int("N", 0, "Become the master.  Specifies the number of nodes in the system, including the master")
 var nodeID *uint = flag.Uint("id", 0, "The node ID to use for consistent hashing.  Should be a 32 bit number.")
 
 func main() {
@@ -292,12 +286,10 @@ func main() {
 	srpc := storagerpc.NewStorageRPC(ss)
 	rpc.Register(srpc)
 	rpc.HandleHTTP()
-	log.Printf("123123")
 	l, e := net.Listen("tcp", fmt.Sprintf(":%d", *portnum))
 	if e != nil {
 		log.Fatal("listen error:", e)
 	}
-	log.Printf("123")
 	log.Printf("Establishing connection with storage servers")
 	go ss.Connect(l.Addr())
 	http.Serve(l, nil)
