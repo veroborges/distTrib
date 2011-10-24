@@ -128,6 +128,7 @@ func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *sto
 func (ss *Storageserver) GetRPC(args *storageproto.GetArgs, reply *storageproto.GetReply) os.Error {
 	val, status := ss.tm.GET(args.Key)
 	reply.Status = status
+	log.Printf("Getting from local storage based on rpc req")
 	if (status == storageproto.OK) {
 		reply.Value = string(val)
 	}
@@ -177,12 +178,14 @@ func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
 	serv := ss.servers[index].(*serverData)
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeid {
+		log.Printf("Getting from local storage")
 		res, stat := ss.tm.GET(key)
 		return res, stat, nil
 	}
+	log.Printf("Getting from %s", serv.clientInfo.HostPort)
 	//if not, call correct server via rpc
 	args := &storageproto.GetArgs{key}
-	var reply storageproto.GetReply
+	reply := new(storageproto.GetReply)
 	err := serv.rpc.Call("StorageRPC.Get", args, reply)
 	if (err != nil) {
 		return nil, 0, err
