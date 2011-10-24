@@ -69,7 +69,8 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 		ss.numnodes--
 	}
 	ss.cond.L.Lock()
-	log.Printf("connecting to other servers")
+	defer ss.cond.L.Unlock()
+	log.Printf("Connecting to other servers")
 	for ss.numnodes > 0 {
 		ss.cond.Wait()
 	}
@@ -91,7 +92,6 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 		}
     }
 	ss.sortServers()
-	ss.cond.L.Unlock()
 }
 
 // You might define here the functions that the locally-linked application
@@ -104,10 +104,11 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 // These should do something! :-)
 
 func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *storageproto.RegisterReply) os.Error {
-	reply.Ready = false
 	ss.cond.L.Lock()
-	log.Printf("Registration from %s", args.ClientInfo.HostPort)
+	defer ss.cond.L.Unlock()
+	reply.Ready = false
 	if (ss.numnodes > 0) {
+		log.Printf("Registration from %s", args.ClientInfo.HostPort)
 		server := &serverData{}
 		server.clientInfo = args.ClientInfo
 		ss.servers[ss.numnodes - 1] = server
@@ -121,7 +122,6 @@ func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *sto
 		}
 		ss.cond.Broadcast()
 	}
-	ss.cond.L.Unlock()
 	return nil
 }
 
@@ -182,7 +182,7 @@ func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
 	}
 	//if not, call correct server via rpc
 	args := &storageproto.GetArgs{key}
-	reply := new(storageproto.GetReply)
+	var reply storageproto.GetReply
 	err := serv.rpc.Call("StorageRPC.Get", args, reply)
 	if (err != nil) {
 		return nil, 0, err

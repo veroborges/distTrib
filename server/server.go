@@ -232,11 +232,9 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 							return err
 						}
 						if recentTribs.Len() >= 100 && recentTribs[0].(tribproto.Tribble).Posted < trib.Posted {
-							log.Printf("poping and pushing")
 							heap.Pop(&recentTribs)
 							heap.Push(&recentTribs, trib)
 						}else if recentTribs.Len() < 100{
-							log.Printf("pushing")
 							heap.Push(&recentTribs, trib)
 						}
 					}
