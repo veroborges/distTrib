@@ -110,7 +110,12 @@ func (ts *Tribserver) GetSubscriptions(args *tribproto.GetSubscriptionsArgs, rep
 		reply.Userids = make([]string, len(subscribers))
 		i:=0
 		for key, _ := range subscribers{
-			reply.Userids[i] = key
+			s := new(string)
+			err = json.Unmarshal([]byte(key), s)
+			if (err != nil) {
+				return err
+			}
+			reply.Userids[i] = *s
 			i++
 		}
 		reply.Status = tribproto.OK
@@ -200,7 +205,10 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 	}
 	if stat == storageproto.OK{
 		suscribers := make(map [string] bool)
-		json.Unmarshal(suscribJson, &suscribers)
+		err = json.Unmarshal(suscribJson, &suscribers)
+		if (err != nil) {
+			return err
+		}
 		recentTribs := vector.Vector(make([]interface{},0, 100))
 		heap.Init(&recentTribs)
 		level := 0
@@ -208,7 +216,12 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 		for recentTribs.Len() < 100 {
 			hasTribs = false
 			for subscriber, _ := range suscribers  {
-				lastJson, _, err := ts.tm.GET(subscriber + LAST)
+				s := new(string)
+				err = json.Unmarshal([]byte(subscriber), s)
+				if err != nil {
+					return err
+				}
+				lastJson, _, err := ts.tm.GET(*s + LAST)
 				if err != nil{
 					return err
 				}
@@ -218,7 +231,7 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 					return err
 				}
 				*last -=level
-				tribbleId := fmt.Sprintf("%s:%d", subscriber, *last)
+				tribbleId := fmt.Sprintf("%s:%d", *s, *last)
 				if (*last > 0) {
 					hasTribs = true
 					tribJson, stat, err := ts.tm.GET(tribbleId)
@@ -232,11 +245,9 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 							return err
 						}
 						if recentTribs.Len() >= 100 && recentTribs[0].(tribproto.Tribble).Posted < trib.Posted {
-							log.Printf("poping and pushing")
 							heap.Pop(&recentTribs)
 							heap.Push(&recentTribs, trib)
 						}else if recentTribs.Len() < 100{
-							log.Printf("pushing")
 							heap.Push(&recentTribs, trib)
 						}
 					}
@@ -270,7 +281,7 @@ func NewTribserver(ss *storageserver.Storageserver) *Tribserver {
 
 var portnum *int = flag.Int("port", 9009, "port # to listen on")
 var storageMasterNodePort *string = flag.String("master", "localhost:9009", "Storage master node")
-var numNodes *int = flag.Int("N", 0, "Become the master.  Specifies the number of nodes in the system, including the master")
+var numNodes *int = flag.Int("N", 1, "Become the master.  Specifies the number of nodes in the system, including the master")
 var nodeID *uint = flag.Uint("id", 0, "The node ID to use for consistent hashing.  Should be a 32 bit number.")
 
 func main() {

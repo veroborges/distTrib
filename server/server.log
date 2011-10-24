@@ -159,3 +159,814 @@ _rt0_amd64+0x8e /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/amd6
 2011/10/22 17:45:18 Server starting on port 33941
 2011/10/22 17:45:18 Server starting on port 23029
 2011/10/22 17:45:19 Server starting on port 54651
+2011/10/24 01:33:43 Server starting on port 26897
+2011/10/24 01:33:43 Establishing connection with storage servers
+2011/10/24 01:33:43 Connecting as slave
+2011/10/24 01:33:43 Failed to connect to the master; retrying: dial tcp localhost:9009: dial tcp 127.0.0.1:9009: connection refused
+2011/10/24 01:33:44 Server starting on port 57530
+2011/10/24 01:33:44 Establishing connection with storage servers
+2011/10/24 01:33:44 Connecting as slave
+2011/10/24 01:33:44 Failed to connect to the master; retrying: dial tcp localhost:9009: dial tcp 127.0.0.1:9009: connection refused
+2011/10/24 01:33:44 Server starting on port 19967
+2011/10/24 01:33:44 Establishing connection with storage servers
+2011/10/24 01:33:44 Connecting as slave
+2011/10/24 01:33:44 Failed to connect to the master; retrying: dial tcp localhost:9009: dial tcp 127.0.0.1:9009: connection refused
+panic: runtime error: integer divide by zero
+
+[signal 0x8 code=0x1 addr=0x474f6a pc=0x474f6a]
+
+runtime.panic+0xac /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:1060
+	runtime.panic(0x58e848, 0xf84000ffd0)
+runtime.panicstring+0xa3 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/runtime.c:116
+	runtime.panicstring(0x6bfd5b, 0xf8400d7830)
+runtime.sigpanic+0x134 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/linux/thread.c:298
+	runtime.sigpanic()
+storageserver.*Storageserver·GetIndex+0x185 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:256
+	storageserver.*Storageserver·GetIndex(0xf840023f80, 0xf84000ffc0, 0x8, 0xf84000ffc3, 0x5bfc84, ...)
+storageserver.*Storageserver·GET+0x4a /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:176
+	storageserver.*Storageserver·GET(0xf840023f80, 0xf84000ffc0, 0xf800000008, 0x5bfc84, 0x73616c3a00000005, ...)
+main.*Tribserver·CreateUser+0x61 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:27
+	main.*Tribserver·CreateUser(0xf8400006c8, 0xf8400d3410, 0xf840000a18, 0x0, 0x0, ...)
+----- stack segment boundary -----
+reflect.internalValue·call+0xf34 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/reflect/value.go:583
+	reflect.internalValue·call(0x564628, 0x13, 0x400c00, 0x0, 0x0, ...)
+reflect.Value·Call+0xd6 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/reflect/value.go:433
+	reflect.Value·Call(0x564618, 0x400c00, 0x0, 0xf8400a0050, 0x300000003, ...)
+rpc.*service·call+0x127 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:339
+	rpc.*service·call(0xf840023f00, 0xf840045a50, 0xf8400006a8, 0xf840024e80, 0xf8400466c0, ...)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+rpc.*Server·ServeCodec+0x840 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:440
+
+goroutine 4 [1]:
+runtime.gosched+0x5c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:603
+	runtime.gosched()
+runtime.exitsyscall+0x73 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:683
+	runtime.exitsyscall()
+syscall.Syscall+0x4b /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:30
+	syscall.Syscall()
+syscall.Read+0x62 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:498
+	syscall.Read(0xf800000009, 0xf8400d1000, 0x100000001000, 0xf8400d3410, 0x7f50ed7ae010, ...)
+net.*netFD·Read+0x172 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:378
+	net.*netFD·Read(0xf840025e60, 0xf8400d1000, 0x100000001000, 0x0, 0x0, ...)
+net.*TCPConn·Read+0x95 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:96
+	net.*TCPConn·Read(0xf840000668, 0xf8400d1000, 0x100000001000, 0xf8400000000, 0x0, ...)
+bufio.*Reader·fill+0xf0 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/bufio/bufio.go:99
+	bufio.*Reader·fill(0xf840023700, 0xa)
+bufio.*Reader·Read+0x188 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/bufio/bufio.go:161
+	bufio.*Reader·Read(0xf840023700, 0xf84000f630, 0x900000001, 0x1, 0x0, ...)
+gob.decodeUintReader+0x81 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decode.go:65
+	gob.decodeUintReader(0xf840043870, 0xf840023700, 0xf84000f630, 0x900000009, 0x0, ...)
+gob.*Decoder·recvMessage+0x43 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:65
+	gob.*Decoder·recvMessage(0xf8400039c0, 0x0, 0xf8400039d8, 0x0)
+gob.*Decoder·decodeTypeSequence+0x53 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:128
+	gob.*Decoder·decodeTypeSequence(0xf8400039c0, 0xf8400d6100, 0x0, 0x0, 0x50f898, ...)
+gob.*Decoder·DecodeValue+0xed /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:192
+	gob.*Decoder·DecodeValue(0xf8400039c0, 0x50f888, 0xf8400d6120, 0x0, 0x0, ...)
+gob.*Decoder·Decode+0x165 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:171
+	gob.*Decoder·Decode(0xf8400039c0, 0x50f888, 0xf8400d6120, 0xf8400d6120, 0x4107f6, ...)
+rpc.*gobServerCodec·ReadRequestHeader+0x4e /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:358
+	rpc.*gobServerCodec·ReadRequestHeader(0xf8400439c0, 0xf8400d6120, 0x41a651, 0x419b59, 0x41a651, ...)
+rpc.*Server·readRequest+0x74 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:488
+	rpc.*Server·readRequest(0xf840045a50, 0xf8400236c0, 0xf8400439c0, 0xf8400d6120, 0x0, ...)
+rpc.*Server·ServeCodec+0x68 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:396
+	rpc.*Server·ServeCodec(0xf840045a50, 0xf8400236c0, 0xf8400439c0, 0xf8400236c0)
+rpc.*Server·ServeConn+0x137 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:388
+	rpc.*Server·ServeConn(0xf840045a50, 0xf840023780, 0xf840000668, 0xf840023780)
+rpc.*Server·ServeHTTP+0x30c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:592
+	rpc.*Server·ServeHTTP(0xf840045a50, 0xf8400237c0, 0xf840023800, 0xf840022f00, 0xf840045a50, ...)
+http.*ServeMux·ServeHTTP+0x189 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:797
+	http.*ServeMux·ServeHTTP(0xf840000298, 0xf8400237c0, 0xf840023800, 0xf840022f00, 0xf840023800, ...)
+http.*conn·serve+0x229 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:546
+	http.*conn·serve(0xf840017910, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+http.*Server·Serve+0x312 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:893
+
+goroutine 3 [3]:
+runtime.entersyscall+0x78 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:639
+	runtime.entersyscall()
+syscall.Syscall6+0x5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:40
+	syscall.Syscall6()
+syscall.Select+0x63 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:1000
+	syscall.Select(0x0, 0x0, 0x0, 0x0, 0xf84000fed0, ...)
+syscall.Sleep+0x7a /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/syscall_linux.go:189
+	syscall.Sleep(0x3b9aca00, 0x84, 0xf84000fec0, 0x46e7c2)
+time.sysSleep+0x25 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/time/sys_posix.go:13
+	time.sysSleep(0x3b9aca00, 0x0, 0x4ea4f8b8, 0x124f929e9cdc4cc0)
+time.sleep+0x40 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/time/sys.go:44
+	time.sleep(0x124f929e614182c0, 0x3b9aca00, 0x7f500000006f, 0x0, 0x0, ...)
+time.Sleep+0x33 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/time/sys.go:33
+	time.Sleep(0x3b9aca00, 0x6c6961460000002d, 0xf84000fe50, 0x100000001)
+storageserver.*Storageserver·Connect+0x175 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:50
+	storageserver.*Storageserver·Connect(0xf840023f80, 0xf8400436c0, 0xf84002fde0, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+main.main+0x3a2 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:294
+
+goroutine 2 [3]:
+runtime.entersyscall+0x78 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:639
+	runtime.entersyscall()
+syscall.Syscall6+0x5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:40
+	syscall.Syscall6()
+syscall.EpollWait+0x80 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:200
+	syscall.EpollWait(0xf800000006, 0xf840026f30, 0xa0000000a, 0xffffffff, 0xc, ...)
+net.*pollster·WaitFD+0xf5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd_linux.go:141
+	net.*pollster·WaitFD(0xf840026f20, 0xf840023e40, 0x0, 0x7200000009, 0x0, ...)
+net.*pollServer·Run+0xcb /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:226
+	net.*pollServer·Run(0xf840023e40, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+net.newPollServer+0x328 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/newpollserver.go:34
+
+goroutine 1 [4]:
+runtime.gosched+0x5c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:603
+	runtime.gosched()
+runtime.chanrecv+0x177 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/chan.c:361
+	runtime.chanrecv(0xf84002ef60, 0x7f50ed761d68, 0x0, 0x0, 0x300000000, ...)
+runtime.chanrecv1+0x4a /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/chan.c:424
+	runtime.chanrecv1(0xf84002ef60, 0xf840025f00)
+net.*pollServer·WaitRead+0x49 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:255
+	net.*pollServer·WaitRead(0xf840023e40, 0xf840025f00, 0x0, 0x0)
+net.*netFD·accept+0x347 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:605
+	net.*netFD·accept(0xf840025f00, 0x43f711, 0x0, 0x0, 0x0, ...)
+net.*TCPListener·AcceptTCP+0x71 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:272
+	net.*TCPListener·AcceptTCP(0xf8400002b0, 0x59d5c8, 0x0, 0x0, 0x8, ...)
+net.*TCPListener·Accept+0x49 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:282
+	net.*TCPListener·Accept(0xf8400002b0, 0x0, 0x0, 0x0, 0x0, ...)
+http.*Server·Serve+0xd9 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:875
+	http.*Server·Serve(0xf840043750, 0xf840023980, 0xf8400002b0, 0x0, 0x0, ...)
+http.Serve+0x70 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:839
+	http.Serve(0xf840023980, 0xf8400002b0, 0x0, 0x0, 0xf840023980, ...)
+main.main+0x3ca /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:295
+	main.main()
+runtime.mainstart+0xf /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/amd64/asm.s:77
+	runtime.mainstart()
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+_rt0_amd64+0x8e /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/amd64/asm.s:64
+2011/10/24 01:33:45 Server starting on port 39565
+2011/10/24 01:33:45 Establishing connection with storage servers
+2011/10/24 01:33:45 Connecting as slave
+2011/10/24 01:33:45 Failed to connect to the master; retrying: dial tcp localhost:9009: dial tcp 127.0.0.1:9009: connection refused
+panic: runtime error: integer divide by zero
+
+[signal 0x8 code=0x1 addr=0x474f6a pc=0x474f6a]
+
+runtime.panic+0xac /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:1060
+	runtime.panic(0x58e848, 0xf84000ffd0)
+runtime.panicstring+0xa3 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/runtime.c:116
+	runtime.panicstring(0x6bfd5b, 0xf8400d7830)
+runtime.sigpanic+0x134 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/linux/thread.c:298
+	runtime.sigpanic()
+storageserver.*Storageserver·GetIndex+0x185 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:256
+	storageserver.*Storageserver·GetIndex(0xf840023f80, 0xf84000ffc0, 0x8, 0xf84000ffc3, 0x5bfc84, ...)
+storageserver.*Storageserver·GET+0x4a /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:176
+	storageserver.*Storageserver·GET(0xf840023f80, 0xf84000ffc0, 0xf800000008, 0x5bfc84, 0x73616c3a00000005, ...)
+main.*Tribserver·CreateUser+0x61 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:27
+	main.*Tribserver·CreateUser(0xf8400006c8, 0xf8400d3410, 0xf840000a18, 0x0, 0x0, ...)
+----- stack segment boundary -----
+reflect.internalValue·call+0xf34 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/reflect/value.go:583
+	reflect.internalValue·call(0x564628, 0x13, 0x400c00, 0x0, 0x0, ...)
+reflect.Value·Call+0xd6 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/reflect/value.go:433
+	reflect.Value·Call(0x564618, 0x400c00, 0x0, 0xf8400a0050, 0x300000003, ...)
+rpc.*service·call+0x127 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:339
+	rpc.*service·call(0xf840023f00, 0xf840045a50, 0xf8400006a8, 0xf840024e80, 0xf8400466c0, ...)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+rpc.*Server·ServeCodec+0x840 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:440
+
+goroutine 4 [1]:
+runtime.gosched+0x5c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:603
+	runtime.gosched()
+runtime.exitsyscall+0x73 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:683
+	runtime.exitsyscall()
+syscall.Syscall+0x4b /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:30
+	syscall.Syscall()
+syscall.Read+0x62 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:498
+	syscall.Read(0xf800000009, 0xf8400d1000, 0x100000001000, 0xf8400d3410, 0x7fb8374a8010, ...)
+net.*netFD·Read+0x172 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:378
+	net.*netFD·Read(0xf840025e60, 0xf8400d1000, 0x100000001000, 0x0, 0x0, ...)
+net.*TCPConn·Read+0x95 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:96
+	net.*TCPConn·Read(0xf840000668, 0xf8400d1000, 0x100000001000, 0xf8400000000, 0x0, ...)
+bufio.*Reader·fill+0xf0 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/bufio/bufio.go:99
+	bufio.*Reader·fill(0xf840023700, 0xa)
+bufio.*Reader·Read+0x188 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/bufio/bufio.go:161
+	bufio.*Reader·Read(0xf840023700, 0xf84000f630, 0x900000001, 0x1, 0x0, ...)
+gob.decodeUintReader+0x81 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decode.go:65
+	gob.decodeUintReader(0xf840043870, 0xf840023700, 0xf84000f630, 0x900000009, 0x0, ...)
+gob.*Decoder·recvMessage+0x43 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:65
+	gob.*Decoder·recvMessage(0xf8400039c0, 0x0, 0xf8400039d8, 0x0)
+gob.*Decoder·decodeTypeSequence+0x53 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:128
+	gob.*Decoder·decodeTypeSequence(0xf8400039c0, 0xf8400d6100, 0x0, 0x0, 0x50f898, ...)
+gob.*Decoder·DecodeValue+0xed /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:192
+	gob.*Decoder·DecodeValue(0xf8400039c0, 0x50f888, 0xf8400d6120, 0x0, 0x0, ...)
+gob.*Decoder·Decode+0x165 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:171
+	gob.*Decoder·Decode(0xf8400039c0, 0x50f888, 0xf8400d6120, 0xf8400d6120, 0x4107f6, ...)
+rpc.*gobServerCodec·ReadRequestHeader+0x4e /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:358
+	rpc.*gobServerCodec·ReadRequestHeader(0xf8400439c0, 0xf8400d6120, 0x41a651, 0x419b59, 0x41a651, ...)
+rpc.*Server·readRequest+0x74 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:488
+	rpc.*Server·readRequest(0xf840045a50, 0xf8400236c0, 0xf8400439c0, 0xf8400d6120, 0x0, ...)
+rpc.*Server·ServeCodec+0x68 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:396
+	rpc.*Server·ServeCodec(0xf840045a50, 0xf8400236c0, 0xf8400439c0, 0xf8400236c0)
+rpc.*Server·ServeConn+0x137 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:388
+	rpc.*Server·ServeConn(0xf840045a50, 0xf840023780, 0xf840000668, 0xf840023780)
+rpc.*Server·ServeHTTP+0x30c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:592
+	rpc.*Server·ServeHTTP(0xf840045a50, 0xf8400237c0, 0xf840023800, 0xf840022f00, 0xf840045a50, ...)
+http.*ServeMux·ServeHTTP+0x189 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:797
+	http.*ServeMux·ServeHTTP(0xf840000298, 0xf8400237c0, 0xf840023800, 0xf840022f00, 0xf840023800, ...)
+http.*conn·serve+0x229 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:546
+	http.*conn·serve(0xf840017910, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+http.*Server·Serve+0x312 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:893
+
+goroutine 3 [3]:
+runtime.entersyscall+0x78 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:639
+	runtime.entersyscall()
+syscall.Syscall6+0x5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:40
+	syscall.Syscall6()
+syscall.Select+0x63 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:1000
+	syscall.Select(0x0, 0x0, 0x0, 0x0, 0xf84000fed0, ...)
+syscall.Sleep+0x7a /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/syscall_linux.go:189
+	syscall.Sleep(0x3b9aca00, 0x84, 0xf84000fec0, 0x46e7c2)
+time.sysSleep+0x25 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/time/sys_posix.go:13
+	time.sysSleep(0x3b9aca00, 0x0, 0x4ea4f8b9, 0x124f929ebb87ec60)
+time.sleep+0x40 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/time/sys.go:44
+	time.sleep(0x124f929e7fed2260, 0x3b9aca00, 0x7fb80000006f, 0x0, 0x0, ...)
+time.Sleep+0x33 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/time/sys.go:33
+	time.Sleep(0x3b9aca00, 0x6c6961460000002d, 0xf84000fe50, 0x100000001)
+storageserver.*Storageserver·Connect+0x175 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:50
+	storageserver.*Storageserver·Connect(0xf840023f80, 0xf8400436c0, 0xf84002fde0, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+main.main+0x3a2 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:294
+
+goroutine 2 [3]:
+runtime.entersyscall+0x78 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:639
+	runtime.entersyscall()
+syscall.Syscall6+0x5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:40
+	syscall.Syscall6()
+syscall.EpollWait+0x80 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:200
+	syscall.EpollWait(0xf800000006, 0xf840026f30, 0xa0000000a, 0xffffffff, 0xc, ...)
+net.*pollster·WaitFD+0xf5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd_linux.go:141
+	net.*pollster·WaitFD(0xf840026f20, 0xf840023e40, 0x0, 0x7200000009, 0x0, ...)
+net.*pollServer·Run+0xcb /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:226
+	net.*pollServer·Run(0xf840023e40, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+net.newPollServer+0x328 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/newpollserver.go:34
+
+goroutine 1 [4]:
+runtime.gosched+0x5c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:603
+	runtime.gosched()
+runtime.chanrecv+0x177 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/chan.c:361
+	runtime.chanrecv(0xf84002ef60, 0x7fb83745bd68, 0x0, 0x0, 0x300000000, ...)
+runtime.chanrecv1+0x4a /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/chan.c:424
+	runtime.chanrecv1(0xf84002ef60, 0xf840025f00)
+net.*pollServer·WaitRead+0x49 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:255
+	net.*pollServer·WaitRead(0xf840023e40, 0xf840025f00, 0x0, 0x0)
+net.*netFD·accept+0x347 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:605
+	net.*netFD·accept(0xf840025f00, 0x43f711, 0x0, 0x0, 0x0, ...)
+net.*TCPListener·AcceptTCP+0x71 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:272
+	net.*TCPListener·AcceptTCP(0xf8400002b0, 0x59d5c8, 0x0, 0x0, 0x8, ...)
+net.*TCPListener·Accept+0x49 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:282
+	net.*TCPListener·Accept(0xf8400002b0, 0x0, 0x0, 0x0, 0x0, ...)
+http.*Server·Serve+0xd9 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:875
+	http.*Server·Serve(0xf840043750, 0xf840023980, 0xf8400002b0, 0x0, 0x0, ...)
+http.Serve+0x70 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:839
+	http.Serve(0xf840023980, 0xf8400002b0, 0x0, 0x0, 0xf840023980, ...)
+main.main+0x3ca /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:295
+	main.main()
+runtime.mainstart+0xf /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/amd64/asm.s:77
+	runtime.mainstart()
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+_rt0_amd64+0x8e /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/amd64/asm.s:64
+2011/10/24 01:33:45 Server starting on port 34200
+2011/10/24 01:33:45 Establishing connection with storage servers
+2011/10/24 01:33:45 Connecting as slave
+2011/10/24 01:33:45 Failed to connect to the master; retrying: dial tcp localhost:9009: dial tcp 127.0.0.1:9009: connection refused
+panic: runtime error: integer divide by zero
+
+[signal 0x8 code=0x1 addr=0x474f6a pc=0x474f6a]
+
+runtime.panic+0xac /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:1060
+	runtime.panic(0x58e848, 0xf8400c4220)
+runtime.panicstring+0xa3 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/runtime.c:116
+	runtime.panicstring(0x6bfd5b, 0xf8400da030)
+runtime.sigpanic+0x134 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/linux/thread.c:298
+	runtime.sigpanic()
+storageserver.*Storageserver·GetIndex+0x185 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:256
+	storageserver.*Storageserver·GetIndex(0xf840023f80, 0xf8400c4210, 0x8, 0xf8400c4213, 0x5bfc84, ...)
+storageserver.*Storageserver·GET+0x4a /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:176
+	storageserver.*Storageserver·GET(0xf840023f80, 0xf8400c4210, 0xf800000008, 0x5bfc84, 0x73616c3a00000005, ...)
+main.*Tribserver·CreateUser+0x61 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:27
+	main.*Tribserver·CreateUser(0xf8400006c8, 0xf8400c4810, 0xf840000b18, 0x0, 0x0, ...)
+----- stack segment boundary -----
+reflect.internalValue·call+0xf34 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/reflect/value.go:583
+	reflect.internalValue·call(0x564628, 0x13, 0x400c00, 0x0, 0x0, ...)
+reflect.Value·Call+0xd6 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/reflect/value.go:433
+	reflect.Value·Call(0x564618, 0x400c00, 0x0, 0xf8400a0050, 0x300000003, ...)
+rpc.*service·call+0x127 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:339
+	rpc.*service·call(0xf840023f00, 0xf840045a50, 0xf8400006a8, 0xf840024e80, 0xf8400466c0, ...)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+rpc.*Server·ServeCodec+0x840 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:440
+
+goroutine 4 [1]:
+runtime.gosched+0x5c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:603
+	runtime.gosched()
+runtime.exitsyscall+0x73 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:683
+	runtime.exitsyscall()
+syscall.Syscall+0x4b /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:30
+	syscall.Syscall()
+syscall.Read+0x62 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:498
+	syscall.Read(0xf800000009, 0xf8400d5000, 0x100000001000, 0xf8400c4810, 0x7f9009d9a010, ...)
+net.*netFD·Read+0x172 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:378
+	net.*netFD·Read(0xf840025e60, 0xf8400d5000, 0x100000001000, 0x0, 0x0, ...)
+net.*TCPConn·Read+0x95 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:96
+	net.*TCPConn·Read(0xf840000668, 0xf8400d5000, 0x100000001000, 0xf8400000000, 0x0, ...)
+bufio.*Reader·fill+0xf0 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/bufio/bufio.go:99
+	bufio.*Reader·fill(0xf840023700, 0xa)
+bufio.*Reader·Read+0x188 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/bufio/bufio.go:161
+	bufio.*Reader·Read(0xf840023700, 0xf84000f630, 0x900000001, 0x1, 0x0, ...)
+gob.decodeUintReader+0x81 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decode.go:65
+	gob.decodeUintReader(0xf840043870, 0xf840023700, 0xf84000f630, 0x900000009, 0x0, ...)
+gob.*Decoder·recvMessage+0x43 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:65
+	gob.*Decoder·recvMessage(0xf8400039c0, 0x0, 0xf8400039d8, 0x0)
+gob.*Decoder·decodeTypeSequence+0x53 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:128
+	gob.*Decoder·decodeTypeSequence(0xf8400039c0, 0xf8400d7300, 0x0, 0x0, 0x50f898, ...)
+gob.*Decoder·DecodeValue+0xed /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:192
+	gob.*Decoder·DecodeValue(0xf8400039c0, 0x50f888, 0xf8400d7300, 0x0, 0x0, ...)
+gob.*Decoder·Decode+0x165 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:171
+	gob.*Decoder·Decode(0xf8400039c0, 0x50f888, 0xf8400d7300, 0xf8400d7300, 0x4107f6, ...)
+rpc.*gobServerCodec·ReadRequestHeader+0x4e /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:358
+	rpc.*gobServerCodec·ReadRequestHeader(0xf8400439c0, 0xf8400d7300, 0x41a651, 0x419b59, 0x41a651, ...)
+rpc.*Server·readRequest+0x74 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:488
+	rpc.*Server·readRequest(0xf840045a50, 0xf8400236c0, 0xf8400439c0, 0xf8400d7300, 0x0, ...)
+rpc.*Server·ServeCodec+0x68 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:396
+	rpc.*Server·ServeCodec(0xf840045a50, 0xf8400236c0, 0xf8400439c0, 0xf8400236c0)
+rpc.*Server·ServeConn+0x137 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:388
+	rpc.*Server·ServeConn(0xf840045a50, 0xf840023780, 0xf840000668, 0xf840023780)
+rpc.*Server·ServeHTTP+0x30c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:592
+	rpc.*Server·ServeHTTP(0xf840045a50, 0xf8400237c0, 0xf840023800, 0xf840022f00, 0xf840045a50, ...)
+http.*ServeMux·ServeHTTP+0x189 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:797
+	http.*ServeMux·ServeHTTP(0xf840000298, 0xf8400237c0, 0xf840023800, 0xf840022f00, 0xf840023800, ...)
+http.*conn·serve+0x229 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:546
+	http.*conn·serve(0xf840017910, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+http.*Server·Serve+0x312 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:893
+
+goroutine 3 [3]:
+runtime.entersyscall+0x78 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:639
+	runtime.entersyscall()
+syscall.Syscall6+0x5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:40
+	syscall.Syscall6()
+syscall.Select+0x63 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:1000
+	syscall.Select(0x0, 0x0, 0x0, 0x0, 0xf8400c4030, ...)
+syscall.Sleep+0x7a /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/syscall_linux.go:189
+	syscall.Sleep(0x3b9aca00, 0x84, 0xf8400c4020, 0x46e7c2)
+time.sysSleep+0x25 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/time/sys_posix.go:13
+	time.sysSleep(0x3b9aca00, 0x0, 0x4ea4f8b9, 0x124f929eda2a3560)
+time.sleep+0x40 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/time/sys.go:44
+	time.sleep(0x124f929e9e8f6b60, 0x3b9aca00, 0x7f900000006f, 0x0, 0x0, ...)
+time.Sleep+0x33 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/time/sys.go:33
+	time.Sleep(0x3b9aca00, 0x6c6961460000002d, 0xf84000ffb0, 0x100000001)
+storageserver.*Storageserver·Connect+0x175 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:50
+	storageserver.*Storageserver·Connect(0xf840023f80, 0xf8400436c0, 0xf84002fde0, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+main.main+0x3a2 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:294
+
+goroutine 2 [3]:
+runtime.entersyscall+0x78 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:639
+	runtime.entersyscall()
+syscall.Syscall6+0x5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:40
+	syscall.Syscall6()
+syscall.EpollWait+0x80 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:200
+	syscall.EpollWait(0xf800000006, 0xf840026f30, 0xa0000000a, 0xffffffff, 0xc, ...)
+net.*pollster·WaitFD+0xf5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd_linux.go:141
+	net.*pollster·WaitFD(0xf840026f20, 0xf840023e40, 0x0, 0x7200000009, 0x0, ...)
+net.*pollServer·Run+0xcb /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:226
+	net.*pollServer·Run(0xf840023e40, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+net.newPollServer+0x328 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/newpollserver.go:34
+
+goroutine 1 [4]:
+runtime.gosched+0x5c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:603
+	runtime.gosched()
+runtime.chanrecv+0x177 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/chan.c:361
+	runtime.chanrecv(0xf84002ef60, 0x7f9009d4dd68, 0x0, 0x0, 0x300000000, ...)
+runtime.chanrecv1+0x4a /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/chan.c:424
+	runtime.chanrecv1(0xf84002ef60, 0xf840025f00)
+net.*pollServer·WaitRead+0x49 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:255
+	net.*pollServer·WaitRead(0xf840023e40, 0xf840025f00, 0x0, 0x0)
+net.*netFD·accept+0x347 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:605
+	net.*netFD·accept(0xf840025f00, 0x43f711, 0x0, 0x0, 0x0, ...)
+net.*TCPListener·AcceptTCP+0x71 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:272
+	net.*TCPListener·AcceptTCP(0xf8400002b0, 0x59d5c8, 0x0, 0x0, 0x8, ...)
+net.*TCPListener·Accept+0x49 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:282
+	net.*TCPListener·Accept(0xf8400002b0, 0x0, 0x0, 0x0, 0x0, ...)
+http.*Server·Serve+0xd9 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:875
+	http.*Server·Serve(0xf840043750, 0xf840023980, 0xf8400002b0, 0x0, 0x0, ...)
+http.Serve+0x70 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:839
+	http.Serve(0xf840023980, 0xf8400002b0, 0x0, 0x0, 0xf840023980, ...)
+main.main+0x3ca /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:295
+	main.main()
+runtime.mainstart+0xf /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/amd64/asm.s:77
+	runtime.mainstart()
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+_rt0_amd64+0x8e /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/amd64/asm.s:64
+2011/10/24 01:33:46 Server starting on port 34528
+2011/10/24 01:33:46 Establishing connection with storage servers
+2011/10/24 01:33:46 Connecting as slave
+2011/10/24 01:33:46 Failed to connect to the master; retrying: dial tcp localhost:9009: dial tcp 127.0.0.1:9009: connection refused
+panic: runtime error: integer divide by zero
+
+[signal 0x8 code=0x1 addr=0x474f6a pc=0x474f6a]
+
+runtime.panic+0xac /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:1060
+	runtime.panic(0x58e848, 0xf8400c4220)
+runtime.panicstring+0xa3 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/runtime.c:116
+	runtime.panicstring(0x6bfd5b, 0xf8400da030)
+runtime.sigpanic+0x134 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/linux/thread.c:298
+	runtime.sigpanic()
+storageserver.*Storageserver·GetIndex+0x185 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:256
+	storageserver.*Storageserver·GetIndex(0xf840023f80, 0xf8400c4210, 0x8, 0xf8400c4213, 0x5bfc84, ...)
+storageserver.*Storageserver·GET+0x4a /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:176
+	storageserver.*Storageserver·GET(0xf840023f80, 0xf8400c4210, 0xf800000008, 0x5bfc84, 0x73616c3a00000005, ...)
+main.*Tribserver·CreateUser+0x61 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:27
+	main.*Tribserver·CreateUser(0xf8400006c8, 0xf8400c4810, 0xf840000b18, 0x0, 0x0, ...)
+----- stack segment boundary -----
+reflect.internalValue·call+0xf34 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/reflect/value.go:583
+	reflect.internalValue·call(0x564628, 0x13, 0x400c00, 0x0, 0x0, ...)
+reflect.Value·Call+0xd6 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/reflect/value.go:433
+	reflect.Value·Call(0x564618, 0x400c00, 0x0, 0xf8400a0050, 0x300000003, ...)
+rpc.*service·call+0x127 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:339
+	rpc.*service·call(0xf840023f00, 0xf840045a50, 0xf8400006a8, 0xf840024e80, 0xf8400466c0, ...)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+rpc.*Server·ServeCodec+0x840 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:440
+
+goroutine 4 [1]:
+runtime.gosched+0x5c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:603
+	runtime.gosched()
+runtime.exitsyscall+0x73 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:683
+	runtime.exitsyscall()
+syscall.Syscall+0x4b /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:30
+	syscall.Syscall()
+syscall.Read+0x62 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:498
+	syscall.Read(0xf800000009, 0xf8400d5000, 0x100000001000, 0xf8400c4810, 0x7fecccf98010, ...)
+net.*netFD·Read+0x172 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:378
+	net.*netFD·Read(0xf840025e60, 0xf8400d5000, 0x100000001000, 0x0, 0x0, ...)
+net.*TCPConn·Read+0x95 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:96
+	net.*TCPConn·Read(0xf840000668, 0xf8400d5000, 0x100000001000, 0xf8400000000, 0x0, ...)
+bufio.*Reader·fill+0xf0 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/bufio/bufio.go:99
+	bufio.*Reader·fill(0xf840023700, 0xa)
+bufio.*Reader·Read+0x188 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/bufio/bufio.go:161
+	bufio.*Reader·Read(0xf840023700, 0xf84000f630, 0x900000001, 0x1, 0x0, ...)
+gob.decodeUintReader+0x81 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decode.go:65
+	gob.decodeUintReader(0xf840043870, 0xf840023700, 0xf84000f630, 0x900000009, 0x0, ...)
+gob.*Decoder·recvMessage+0x43 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:65
+	gob.*Decoder·recvMessage(0xf8400039c0, 0x0, 0xf8400039d8, 0x0)
+gob.*Decoder·decodeTypeSequence+0x53 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:128
+	gob.*Decoder·decodeTypeSequence(0xf8400039c0, 0xf8400d7300, 0x0, 0x0, 0x50f898, ...)
+gob.*Decoder·DecodeValue+0xed /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:192
+	gob.*Decoder·DecodeValue(0xf8400039c0, 0x50f888, 0xf8400d7300, 0x0, 0x0, ...)
+gob.*Decoder·Decode+0x165 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:171
+	gob.*Decoder·Decode(0xf8400039c0, 0x50f888, 0xf8400d7300, 0xf8400d7300, 0x4107f6, ...)
+rpc.*gobServerCodec·ReadRequestHeader+0x4e /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:358
+	rpc.*gobServerCodec·ReadRequestHeader(0xf8400439c0, 0xf8400d7300, 0x41a651, 0x419b59, 0x41a651, ...)
+rpc.*Server·readRequest+0x74 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:488
+	rpc.*Server·readRequest(0xf840045a50, 0xf8400236c0, 0xf8400439c0, 0xf8400d7300, 0x0, ...)
+rpc.*Server·ServeCodec+0x68 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:396
+	rpc.*Server·ServeCodec(0xf840045a50, 0xf8400236c0, 0xf8400439c0, 0xf8400236c0)
+rpc.*Server·ServeConn+0x137 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:388
+	rpc.*Server·ServeConn(0xf840045a50, 0xf840023780, 0xf840000668, 0xf840023780)
+rpc.*Server·ServeHTTP+0x30c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:592
+	rpc.*Server·ServeHTTP(0xf840045a50, 0xf8400237c0, 0xf840023800, 0xf840022f00, 0xf840045a50, ...)
+http.*ServeMux·ServeHTTP+0x189 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:797
+	http.*ServeMux·ServeHTTP(0xf840000298, 0xf8400237c0, 0xf840023800, 0xf840022f00, 0xf840023800, ...)
+http.*conn·serve+0x229 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:546
+	http.*conn·serve(0xf840017910, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+http.*Server·Serve+0x312 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:893
+
+goroutine 3 [3]:
+runtime.entersyscall+0x78 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:639
+	runtime.entersyscall()
+syscall.Syscall6+0x5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:40
+	syscall.Syscall6()
+syscall.Select+0x63 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:1000
+	syscall.Select(0x0, 0x0, 0x0, 0x0, 0xf8400c4030, ...)
+syscall.Sleep+0x7a /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/syscall_linux.go:189
+	syscall.Sleep(0x3b9aca00, 0x84, 0xf8400c4020, 0x46e7c2)
+time.sysSleep+0x25 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/time/sys_posix.go:13
+	time.sysSleep(0x3b9aca00, 0x0, 0x4ea4f8ba, 0x124f929ef8e16dc0)
+time.sleep+0x40 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/time/sys.go:44
+	time.sleep(0x124f929ebd46a3c0, 0x3b9aca00, 0x7fec0000006f, 0x0, 0x0, ...)
+time.Sleep+0x33 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/time/sys.go:33
+	time.Sleep(0x3b9aca00, 0x6c6961460000002d, 0xf84000ffb0, 0x100000001)
+storageserver.*Storageserver·Connect+0x175 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:50
+	storageserver.*Storageserver·Connect(0xf840023f80, 0xf8400436c0, 0xf84002fde0, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+main.main+0x3a2 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:294
+
+goroutine 2 [3]:
+runtime.entersyscall+0x78 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:639
+	runtime.entersyscall()
+syscall.Syscall6+0x5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:40
+	syscall.Syscall6()
+syscall.EpollWait+0x80 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:200
+	syscall.EpollWait(0xf800000006, 0xf840026f30, 0xa0000000a, 0xffffffff, 0xc, ...)
+net.*pollster·WaitFD+0xf5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd_linux.go:141
+	net.*pollster·WaitFD(0xf840026f20, 0xf840023e40, 0x0, 0x7200000009, 0x0, ...)
+net.*pollServer·Run+0xcb /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:226
+	net.*pollServer·Run(0xf840023e40, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+net.newPollServer+0x328 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/newpollserver.go:34
+
+goroutine 1 [4]:
+runtime.gosched+0x5c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:603
+	runtime.gosched()
+runtime.chanrecv+0x177 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/chan.c:361
+	runtime.chanrecv(0xf84002ef60, 0x7fecccf4bd68, 0x0, 0x0, 0x300000000, ...)
+runtime.chanrecv1+0x4a /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/chan.c:424
+	runtime.chanrecv1(0xf84002ef60, 0xf840025f00)
+net.*pollServer·WaitRead+0x49 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:255
+	net.*pollServer·WaitRead(0xf840023e40, 0xf840025f00, 0x0, 0x0)
+net.*netFD·accept+0x347 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:605
+	net.*netFD·accept(0xf840025f00, 0x43f711, 0x0, 0x0, 0x0, ...)
+net.*TCPListener·AcceptTCP+0x71 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:272
+	net.*TCPListener·AcceptTCP(0xf8400002b0, 0x59d5c8, 0x0, 0x0, 0x8, ...)
+net.*TCPListener·Accept+0x49 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:282
+	net.*TCPListener·Accept(0xf8400002b0, 0x0, 0x0, 0x0, 0x0, ...)
+http.*Server·Serve+0xd9 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:875
+	http.*Server·Serve(0xf840043750, 0xf840023980, 0xf8400002b0, 0x0, 0x0, ...)
+http.Serve+0x70 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:839
+	http.Serve(0xf840023980, 0xf8400002b0, 0x0, 0x0, 0xf840023980, ...)
+main.main+0x3ca /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:295
+	main.main()
+runtime.mainstart+0xf /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/amd64/asm.s:77
+	runtime.mainstart()
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+_rt0_amd64+0x8e /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/amd64/asm.s:64
+2011/10/24 01:33:46 Server starting on port 21287
+2011/10/24 01:33:46 Establishing connection with storage servers
+2011/10/24 01:33:46 Connecting as slave
+2011/10/24 01:33:46 Failed to connect to the master; retrying: dial tcp localhost:9009: dial tcp 127.0.0.1:9009: connection refused
+panic: runtime error: integer divide by zero
+
+[signal 0x8 code=0x1 addr=0x474f6a pc=0x474f6a]
+
+runtime.panic+0xac /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:1060
+	runtime.panic(0x58e848, 0xf84000f4d0)
+runtime.panicstring+0xa3 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/runtime.c:116
+	runtime.panicstring(0x6bfd5b, 0xf840023770)
+runtime.sigpanic+0x134 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/linux/thread.c:298
+	runtime.sigpanic()
+storageserver.*Storageserver·GetIndex+0x185 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:256
+	storageserver.*Storageserver·GetIndex(0xf840023f80, 0xf8400467c0, 0x11, 0xf8400467c3, 0x5ce7e4, ...)
+storageserver.*Storageserver·GET+0x4a /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:176
+	storageserver.*Storageserver·GET(0xf840023f80, 0xf8400467c0, 0xf800000011, 0x5ce7e4, 0x6275733a0000000e, ...)
+main.*Tribserver·GetSubscriptions+0x72 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:100
+	main.*Tribserver·GetSubscriptions(0xf8400006c8, 0xf8400c4800, 0xf8400d45a0, 0x0, 0x0, ...)
+----- stack segment boundary -----
+reflect.internalValue·call+0xf34 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/reflect/value.go:583
+	reflect.internalValue·call(0x5646a8, 0x13, 0x40137c, 0x0, 0x0, ...)
+reflect.Value·Call+0xd6 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/reflect/value.go:433
+	reflect.Value·Call(0x564698, 0x40137c, 0x0, 0xf840017960, 0x300000003, ...)
+rpc.*service·call+0x127 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:339
+	rpc.*service·call(0xf840023f00, 0xf840045a50, 0xf8400005c0, 0xf840024e00, 0xf8400d4060, ...)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+rpc.*Server·ServeCodec+0x840 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:440
+
+goroutine 5 [4]:
+runtime.gosched+0x5c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:603
+	runtime.gosched()
+runtime.chanrecv+0x177 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/chan.c:361
+	runtime.chanrecv(0xf840032d80, 0x7f08f18149b0, 0x0, 0x0, 0xa00004f99, ...)
+runtime.chanrecv1+0x4a /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/chan.c:424
+	runtime.chanrecv1(0xf840032d80, 0xf8400d50a0)
+net.*pollServer·WaitRead+0x49 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:255
+	net.*pollServer·WaitRead(0xf840023e40, 0xf8400d50a0, 0x100000001000, 0xbffffffff)
+net.*netFD·Read+0x1a4 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:380
+	net.*netFD·Read(0xf8400d50a0, 0xf8400de000, 0x100000001000, 0x0, 0x0, ...)
+net.*TCPConn·Read+0x95 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:96
+	net.*TCPConn·Read(0xf8400005f8, 0xf8400de000, 0x100000001000, 0x0, 0x0, ...)
+bufio.*Reader·fill+0xf0 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/bufio/bufio.go:99
+	bufio.*Reader·fill(0xf840023780, 0x8)
+bufio.*Reader·Read+0x188 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/bufio/bufio.go:161
+	bufio.*Reader·Read(0xf840023780, 0xf84000f620, 0x900000001, 0x1, 0x0, ...)
+gob.decodeUintReader+0x81 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decode.go:65
+	gob.decodeUintReader(0xf8400d3090, 0xf840023780, 0xf84000f620, 0x900000009, 0x0, ...)
+gob.*Decoder·recvMessage+0x43 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:65
+	gob.*Decoder·recvMessage(0xf8400039c0, 0x0, 0xf8400039d8, 0x0)
+gob.*Decoder·decodeTypeSequence+0x53 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:128
+	gob.*Decoder·decodeTypeSequence(0xf8400039c0, 0xf840046600, 0x0, 0x0, 0x50f898, ...)
+gob.*Decoder·DecodeValue+0xed /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:192
+	gob.*Decoder·DecodeValue(0xf8400039c0, 0x50f888, 0xf8400466c0, 0x0, 0x0, ...)
+gob.*Decoder·Decode+0x165 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:171
+	gob.*Decoder·Decode(0xf8400039c0, 0x50f888, 0xf8400466c0, 0xf8400466c0, 0x26e4060, ...)
+rpc.*gobServerCodec·ReadRequestHeader+0x4e /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:358
+	rpc.*gobServerCodec·ReadRequestHeader(0xf840043960, 0xf8400466c0, 0x8, 0x100000000, 0x1, ...)
+rpc.*Server·readRequest+0x74 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:488
+	rpc.*Server·readRequest(0xf840045a50, 0xf8400c6940, 0xf840043960, 0xf8400466c0, 0x0, ...)
+rpc.*Server·ServeCodec+0x68 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:396
+	rpc.*Server·ServeCodec(0xf840045a50, 0xf8400c6940, 0xf840043960, 0xf8400c6940)
+rpc.*Server·ServeConn+0x137 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:388
+	rpc.*Server·ServeConn(0xf840045a50, 0xf8400c6880, 0xf8400005f8, 0xf8400c6880)
+rpc.*Server·ServeHTTP+0x30c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:592
+	rpc.*Server·ServeHTTP(0xf840045a50, 0xf8400c6840, 0xf840023800, 0xf8400dc000, 0xf840045a50, ...)
+http.*ServeMux·ServeHTTP+0x189 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:797
+	http.*ServeMux·ServeHTTP(0xf840000298, 0xf8400c6840, 0xf840023800, 0xf8400dc000, 0xf840023800, ...)
+http.*conn·serve+0x229 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:546
+	http.*conn·serve(0xf8400a0050, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+http.*Server·Serve+0x312 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:893
+
+goroutine 4 [1]:
+runtime.gosched+0x5c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:603
+	runtime.gosched()
+runtime.exitsyscall+0x73 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:683
+	runtime.exitsyscall()
+syscall.Syscall+0x4b /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:30
+	syscall.Syscall()
+syscall.Read+0x62 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:498
+	syscall.Read(0xf800000009, 0xf8400d9000, 0x100000001000, 0xf8400c4800, 0x7f08f185dbe0, ...)
+net.*netFD·Read+0x172 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:378
+	net.*netFD·Read(0xf840025e60, 0xf8400d9000, 0x100000001000, 0x0, 0x0, ...)
+net.*TCPConn·Read+0x95 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:96
+	net.*TCPConn·Read(0xf840000668, 0xf8400d9000, 0x100000001000, 0xf7800000000, 0x0, ...)
+bufio.*Reader·fill+0xf0 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/bufio/bufio.go:99
+	bufio.*Reader·fill(0xf8400c6900, 0xe)
+bufio.*Reader·Read+0x188 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/bufio/bufio.go:161
+	bufio.*Reader·Read(0xf8400c6900, 0xf8400c4230, 0x900000001, 0x1, 0x0, ...)
+gob.decodeUintReader+0x81 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decode.go:65
+	gob.decodeUintReader(0xf8400d3090, 0xf8400c6900, 0xf8400c4230, 0x900000009, 0x0, ...)
+gob.*Decoder·recvMessage+0x43 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:65
+	gob.*Decoder·recvMessage(0xf8400ca0d0, 0x0, 0xf8400ca0e8, 0x0)
+gob.*Decoder·decodeTypeSequence+0x53 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:128
+	gob.*Decoder·decodeTypeSequence(0xf8400ca0d0, 0xf8400d4600, 0x0, 0x0, 0x50f898, ...)
+gob.*Decoder·DecodeValue+0xed /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:192
+	gob.*Decoder·DecodeValue(0xf8400ca0d0, 0x50f888, 0xf8400d4640, 0x0, 0x0, ...)
+gob.*Decoder·Decode+0x165 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/gob/decoder.go:171
+	gob.*Decoder·Decode(0xf8400ca0d0, 0x50f888, 0xf8400d4640, 0xf8400d4640, 0x4107f6, ...)
+rpc.*gobServerCodec·ReadRequestHeader+0x4e /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:358
+	rpc.*gobServerCodec·ReadRequestHeader(0xf8400d31e0, 0xf8400d4640, 0x41a651, 0x419b59, 0x41a651, ...)
+rpc.*Server·readRequest+0x74 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:488
+	rpc.*Server·readRequest(0xf840045a50, 0xf8400c6940, 0xf8400d31e0, 0xf8400d4640, 0x0, ...)
+rpc.*Server·ServeCodec+0x68 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:396
+	rpc.*Server·ServeCodec(0xf840045a50, 0xf8400c6940, 0xf8400d31e0, 0xf8400c6940)
+rpc.*Server·ServeConn+0x137 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:388
+	rpc.*Server·ServeConn(0xf840045a50, 0xf8400c6880, 0xf840000668, 0xf8400c6880)
+rpc.*Server·ServeHTTP+0x30c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/rpc/server.go:592
+	rpc.*Server·ServeHTTP(0xf840045a50, 0xf8400c6840, 0xf8400c6800, 0xf840022f00, 0xf840045a50, ...)
+http.*ServeMux·ServeHTTP+0x189 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:797
+	http.*ServeMux·ServeHTTP(0xf840000298, 0xf8400c6840, 0xf8400c6800, 0xf840022f00, 0xf8400c6800, ...)
+http.*conn·serve+0x229 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:546
+	http.*conn·serve(0xf840017910, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+http.*Server·Serve+0x312 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:893
+
+goroutine 3 [3]:
+runtime.entersyscall+0x78 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:639
+	runtime.entersyscall()
+syscall.Syscall6+0x5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:40
+	syscall.Syscall6()
+syscall.Select+0x63 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:1000
+	syscall.Select(0x0, 0x0, 0x0, 0x0, 0xf8400c4030, ...)
+syscall.Sleep+0x7a /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/syscall_linux.go:189
+	syscall.Sleep(0x3b9aca00, 0x84, 0xf8400c4020, 0x46e7c2)
+time.sysSleep+0x25 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/time/sys_posix.go:13
+	time.sysSleep(0x3b9aca00, 0x0, 0x4ea4f8ba, 0x124f929f17831e68)
+time.sleep+0x40 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/time/sys.go:44
+	time.sleep(0x124f929edbe85468, 0x3b9aca00, 0x7f080000006f, 0x0, 0x0, ...)
+time.Sleep+0x33 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/time/sys.go:33
+	time.Sleep(0x3b9aca00, 0x6c6961460000002d, 0xf84000ffb0, 0x100000001)
+storageserver.*Storageserver·Connect+0x175 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/storageserver/storageserver.go:50
+	storageserver.*Storageserver·Connect(0xf840023f80, 0xf8400436c0, 0xf84002fde0, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+main.main+0x3a2 /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:294
+
+goroutine 2 [3]:
+runtime.entersyscall+0x78 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:639
+	runtime.entersyscall()
+syscall.Syscall6+0x5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/asm_linux_amd64.s:40
+	syscall.Syscall6()
+syscall.EpollWait+0x80 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/syscall/zsyscall_linux_amd64.go:200
+	syscall.EpollWait(0xf800000006, 0xf840026f30, 0xa0000000a, 0xffffffff, 0xc, ...)
+net.*pollster·WaitFD+0xf5 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd_linux.go:141
+	net.*pollster·WaitFD(0xf840026f20, 0xf840023e40, 0x0, 0x7200000009, 0x0, ...)
+net.*pollServer·Run+0xcb /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:226
+	net.*pollServer·Run(0xf840023e40, 0x0)
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+net.newPollServer+0x328 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/newpollserver.go:34
+
+goroutine 1 [4]:
+runtime.gosched+0x5c /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:603
+	runtime.gosched()
+runtime.chanrecv+0x177 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/chan.c:361
+	runtime.chanrecv(0xf84002ef60, 0x7f08f1810d68, 0x0, 0x0, 0x300000000, ...)
+runtime.chanrecv1+0x4a /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/chan.c:424
+	runtime.chanrecv1(0xf84002ef60, 0xf840025f00)
+net.*pollServer·WaitRead+0x49 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:255
+	net.*pollServer·WaitRead(0xf840023e40, 0xf840025f00, 0x0, 0x0)
+net.*netFD·accept+0x347 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/fd.go:605
+	net.*netFD·accept(0xf840025f00, 0x43f711, 0x0, 0x0, 0x0, ...)
+net.*TCPListener·AcceptTCP+0x71 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:272
+	net.*TCPListener·AcceptTCP(0xf8400002b0, 0x59d5c8, 0x0, 0x0, 0x8, ...)
+net.*TCPListener·Accept+0x49 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/net/tcpsock.go:282
+	net.*TCPListener·Accept(0xf8400002b0, 0x0, 0x0, 0x0, 0x0, ...)
+http.*Server·Serve+0xd9 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:875
+	http.*Server·Serve(0xf840043750, 0xf840023980, 0xf8400002b0, 0x0, 0x0, ...)
+http.Serve+0x70 /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/http/server.go:839
+	http.Serve(0xf840023980, 0xf8400002b0, 0x0, 0x0, 0xf840023980, ...)
+main.main+0x3ca /afs/andrew.cmu.edu/usr2/ahuseyno/DS/p2/distTrib/server/server.go:295
+	main.main()
+runtime.mainstart+0xf /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/amd64/asm.s:77
+	runtime.mainstart()
+runtime.goexit /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/proc.c:178
+	runtime.goexit()
+----- goroutine created by -----
+_rt0_amd64+0x8e /afs/cs.cmu.edu/academic/class/15440-f11/go/src/pkg/runtime/amd64/asm.s:64
+2011/10/24 01:34:26 Server starting on port 39426
+2011/10/24 01:34:26 Establishing connection with storage servers
+2011/10/24 01:34:26 connecting to other servers
+2011/10/24 01:34:27 Server starting on port 25297
+2011/10/24 01:34:27 Establishing connection with storage servers
+2011/10/24 01:34:27 connecting to other servers
+2011/10/24 01:34:28 Server starting on port 36720
+2011/10/24 01:34:28 Establishing connection with storage servers
+2011/10/24 01:34:28 connecting to other servers
+2011/10/24 01:34:28 Server starting on port 44291
+2011/10/24 01:34:28 Establishing connection with storage servers
+2011/10/24 01:34:28 connecting to other servers
+2011/10/24 01:34:29 Server starting on port 26112
+2011/10/24 01:34:29 Establishing connection with storage servers
+2011/10/24 01:34:29 connecting to other servers
+2011/10/24 01:34:30 Server starting on port 53532
+2011/10/24 01:34:30 Establishing connection with storage servers
+2011/10/24 01:34:30 connecting to other servers
+2011/10/24 01:34:30 Server starting on port 47138
+2011/10/24 01:34:30 Establishing connection with storage servers
+2011/10/24 01:34:30 connecting to other servers
+2011/10/24 01:48:28 Server starting on port 48070
+2011/10/24 01:48:28 Establishing connection with storage servers
+2011/10/24 01:48:28 connecting to other servers
+2011/10/24 01:48:28 Server starting on port 32672
+2011/10/24 01:48:28 Establishing connection with storage servers
+2011/10/24 01:48:28 connecting to other servers
+2011/10/24 01:48:29 Server starting on port 56047
+2011/10/24 01:48:29 Establishing connection with storage servers
+2011/10/24 01:48:29 connecting to other servers
+2011/10/24 01:48:29 Server starting on port 39431
+2011/10/24 01:48:29 Establishing connection with storage servers
+2011/10/24 01:48:29 connecting to other servers
+2011/10/24 01:48:30 Server starting on port 39771
+2011/10/24 01:48:30 Establishing connection with storage servers
+2011/10/24 01:48:30 connecting to other servers
+2011/10/24 01:48:31 Server starting on port 43198
+2011/10/24 01:48:31 Establishing connection with storage servers
+2011/10/24 01:48:31 connecting to other servers
+2011/10/24 01:48:32 Server starting on port 17326
+2011/10/24 01:48:32 Establishing connection with storage servers
+2011/10/24 01:48:32 connecting to other servers

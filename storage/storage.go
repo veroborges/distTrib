@@ -38,23 +38,22 @@ func (tm *TribMap) AddToList(key string, element []byte) (int, os.Error) {
 	tm.lock.Lock()
 	defer tm.lock.Unlock()
 	_, ok := tm.data[key]
+	var set map[string] bool
+	var err os.Error
 	if (!ok) {
-		return storageproto.EKEYNOTFOUND, nil
+		set = make(map[string] bool)
+	} else {
+		set, err = tm.GetSet(key)
+		if (err != nil) {
+			return storageproto.EPUTFAILED, err
+		}
 	}
-	set, err := tm.GetSet(key)
-	if (err != nil) {
-		return storageproto.EPUTFAILED, err
-	}
-	s := new(string)
-	err = json.Unmarshal(element, s)
-	if (err != nil) {
-		return storageproto.EPUTFAILED, err
-	}
-	_, ok = set[*s]
+	s := string(element)
+	_, ok = set[s]
 	if (ok) {
 		return storageproto.EITEMEXISTS, err
 	}
-	set[*s] = true
+	set[s] = true
 	val, err := json.Marshal(set)
 	if (err != nil) {
 		return storageproto.EPUTFAILED, err
@@ -74,16 +73,12 @@ func (tm *TribMap) RemoveFromList(key string, element []byte) (int, os.Error) {
 	if (err != nil) {
 		return storageproto.EPUTFAILED, err
 	}
-	s := new(string)
-        err = json.Unmarshal(element, s)
-        if (err != nil) {
-                return storageproto.EPUTFAILED, err
-        }
-	_, ok = set[*s]
+	s := string(element)
+	_, ok = set[s]
 	if (!ok) {
 		return storageproto.EITEMNOTFOUND, err
 	}
-        set[*s] = false, false
+        set[s] = false, false
 	val, err := json.Marshal(set)
 	if (err != nil) {
 		return storageproto.EPUTFAILED, err
