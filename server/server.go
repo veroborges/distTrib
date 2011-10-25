@@ -18,18 +18,23 @@ import (
 	"storageserver"
 	"storagerpc"
 )
-
+//list of a user's subscriptions is stored as <user>:subscriptions
 const SUBSCRIPTIONS string = ":subscriptions"
+
+//counter of tribbles for a user is stored as <user>:last
 const LAST string = ":last"
 
 func (ts *Tribserver) CreateUser(args *tribproto.CreateUserArgs, reply *tribproto.CreateUserReply) os.Error {
-	//if a map fot that user exists (present is true) return EEXISTS
+	//check if user exists
 	 _, stat, err := ts.tm.GET(args.Userid + LAST)
 	if (err != nil) {
 		return err
 	}
+
+	//return if exists already
 	if stat == storageproto.OK {
 		reply.Status = tribproto.EEXISTS
+
 	} else  {
 		//initialize the 3 maps for the user
 		val, _ := json.Marshal(0)
@@ -59,6 +64,7 @@ func (ts *Tribserver) AddSubscription(args *tribproto.SubscriptionArgs, reply *t
 			if (err != nil) {
 				return err
 			}
+			//add suscription to user's list
 			ts.tm.AddToList(args.Userid + SUBSCRIPTIONS, val)
 		} else {
 			reply.Status = tribproto.ENOSUCHTARGETUSER
@@ -86,6 +92,8 @@ func (ts *Tribserver) RemoveSubscription(args *tribproto.SubscriptionArgs, reply
 			if (err != nil) {
 				return err
 			}
+
+			//remove subscription from user
 			ts.tm.RemoveFromList(args.Userid + SUBSCRIPTIONS, val)
 		} else {
 			reply.Status = tribproto.ENOSUCHTARGETUSER
@@ -97,6 +105,7 @@ func (ts *Tribserver) RemoveSubscription(args *tribproto.SubscriptionArgs, reply
 }
 
 func (ts *Tribserver) GetSubscriptions(args *tribproto.GetSubscriptionsArgs, reply *tribproto.GetSubscriptionsReply) os.Error {
+	//check if user exists
 	suscribersJson, stat, err := ts.tm.GET(args.Userid + SUBSCRIPTIONS)
 	if (err != nil) {
 		return err
@@ -109,6 +118,8 @@ func (ts *Tribserver) GetSubscriptions(args *tribproto.GetSubscriptionsArgs, rep
 		}
 		reply.Userids = make([]string, len(subscribers))
 		i:=0
+
+		//add each userid in the suscribers list to the reply arg
 		for key, _ := range subscribers{
 			s := new(string)
 			err = json.Unmarshal([]byte(key), s)
@@ -126,6 +137,7 @@ func (ts *Tribserver) GetSubscriptions(args *tribproto.GetSubscriptionsArgs, rep
 }
 
 func (ts *Tribserver) PostTribble(args *tribproto.PostTribbleArgs, reply *tribproto.PostTribbleReply) os.Error {
+	//check that the user exists
 	lastJson, stat, err := ts.tm.GET(args.Userid + LAST)
 	if (err != nil) {
 		return err
@@ -136,6 +148,7 @@ func (ts *Tribserver) PostTribble(args *tribproto.PostTribbleArgs, reply *tribpr
 		 *last++
 		 lastStr := fmt.Sprintf(":%d", *last)
 
+     //make new tribble struct with args
 		 tribble := new(tribproto.Tribble)
 		 tribble.Userid = args.Userid
 		 tribble.Posted = time.Nanoseconds()
@@ -145,6 +158,8 @@ func (ts *Tribserver) PostTribble(args *tribproto.PostTribbleArgs, reply *tribpr
 		if (err != nil) {
 			return err
 		}
+
+		//put in the storage system
 		_, err = ts.tm.PUT(args.Userid + lastStr, val)
 		if (err != nil) {
 			return err
@@ -153,6 +168,8 @@ func (ts *Tribserver) PostTribble(args *tribproto.PostTribbleArgs, reply *tribpr
 		if (err != nil) {
 			return err
 		}
+
+		//update tribble counter
 		ts.tm.PUT(args.Userid + LAST, val)
 	} else {
 		reply.Status = tribproto.ENOSUCHUSER
@@ -161,6 +178,7 @@ func (ts *Tribserver) PostTribble(args *tribproto.PostTribbleArgs, reply *tribpr
 }
 
 func (ts *Tribserver) GetTribbles(args *tribproto.GetTribblesArgs, reply *tribproto.GetTribblesReply) os.Error {
+	//check if user exists
 	lastJson, stat, err := ts.tm.GET(args.Userid + LAST)
 	if err != nil {
 		return err
@@ -175,6 +193,8 @@ func (ts *Tribserver) GetTribbles(args *tribproto.GetTribblesArgs, reply *tribpr
 		if (size > 100) {
 			size = 100
 		}
+
+		//get 100 latest tribbles from user and add to the reply arg
 		reply.Tribbles = make([]tribproto.Tribble, size)
 		for i := 0; i < size; i++ {
 			tribbleId := fmt.Sprintf("%s:%d", args.Userid, *last)
@@ -199,6 +219,7 @@ func (ts *Tribserver) GetTribbles(args *tribproto.GetTribblesArgs, reply *tribpr
 }
 
 func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs, reply *tribproto.GetTribblesReply) os.Error {
+	//check if user exists
 	suscribJson, stat, err := ts.tm.GET(args.Userid + SUBSCRIPTIONS)
 	if err != nil {
 		return err
@@ -209,18 +230,25 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 		if (err != nil) {
 			return err
 		}
+
+		//make minheap to store recent tribbles
 		recentTribs := vector.Vector(make([]interface{},0, 100))
 		heap.Init(&recentTribs)
 		level := 0
 		hasTribs := false
+		
+		//continue adding tribbles to heap until we reach a 100 or no more tribbles
 		for recentTribs.Len() < 100 {
 			hasTribs = false
+			
+			//for each suscription, get the last tribble
 			for subscriber, _ := range suscribers  {
 				s := new(string)
 				err = json.Unmarshal([]byte(subscriber), s)
 				if err != nil {
 					return err
 				}
+
 				lastJson, _, err := ts.tm.GET(*s + LAST)
 				if err != nil{
 					return err
@@ -244,9 +272,13 @@ func (ts *Tribserver) GetTribblesBySubscription(args *tribproto.GetTribblesArgs,
 						if (err != nil) {
 							return err
 						}
+
+						//add to tribble if more recent than oldest tribble in heap
 						if recentTribs.Len() >= 100 && recentTribs[0].(tribproto.Tribble).Posted < trib.Posted {
 							heap.Pop(&recentTribs)
 							heap.Push(&recentTribs, trib)
+
+						//add to tribble if less than 100 in heap
 						}else if recentTribs.Len() < 100{
 							heap.Push(&recentTribs, trib)
 						}
