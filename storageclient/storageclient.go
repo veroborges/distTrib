@@ -64,7 +64,7 @@ func main() {
 	// This is a little ugly, but it's quick to code. :)
 	// What's the saying?  "Do what I say, not what I do."
 	var putargs *storageproto.PutArgs
-	getargs := &storageproto.GetArgs{flag.Arg(1)}
+	getargs := &storageproto.GetArgs{flag.Arg(1), false, storageproto.Client{"",0}}
 	getreply := &storageproto.GetReply{}
 	putreply := &storageproto.PutReply{}
 	getlistreply := &storageproto.GetListReply{}
