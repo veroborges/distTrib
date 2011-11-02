@@ -44,3 +44,7 @@ func (srpc *StorageRPC) RemoveFromList(args *storageproto.PutArgs, reply *storag
 func (srpc *StorageRPC) Register(args *storageproto.RegisterArgs, reply *storageproto.RegisterReply) os.Error {
 	return srpc.ss.RegisterRPC(args, reply)
 }
+
+func (srpc *StorageRPC) RevokeLease(args *storageproto.RevokeLeaseArgs, reply *storageproto.RevokeLeaseReply) os.Error {
+	return srpc.ss.RevokeLeaseRPC(args, reply)
+}

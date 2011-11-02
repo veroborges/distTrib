@@ -6,21 +6,30 @@ const (
 	EKEYNOTFOUND
 	EITEMNOTFOUND // lists
 	EPUTFAILED
-	EITEMEXISTS
+	EITEMEXISTS // lists, duplicate put
 )
+
+type LeaseStruct struct {
+	Granted bool
+	ValidSeconds int
+}
 
 type GetArgs struct {
 	Key string
+	WantLease bool
+	LeaseClient Client // StorageServer that wants the lease
 }
 
 type GetReply struct {
 	Status int
 	Value string
+	Lease LeaseStruct
 }
 
 type GetListReply struct {
 	Status int
 	Value []string
+	Lease LeaseStruct
 }
 
 type PutArgs struct {
@@ -43,4 +52,12 @@ type RegisterArgs struct {
 type RegisterReply struct {
 	Ready bool
 	Clients []Client 
+}
+
+type RevokeLeaseArgs struct {
+	Key string
+}
+
+type RevokeLeaseReply struct {
+	Status int
 }

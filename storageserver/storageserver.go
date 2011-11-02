@@ -16,9 +16,10 @@ import (
 	"sort"
 )
 
+
 type Storageserver struct {
 	tm *storage.TribMap
-	servers []interface{}
+	servers []interface{} //stores the existing storage servers
 	numnodes int
 	nodeid uint32
 	cond *sync.Cond
@@ -26,8 +27,8 @@ type Storageserver struct {
 }
 
 type serverData struct {
-	rpc *rpc.Client
-	clientInfo storageproto.Client
+	rpc *rpc.Client     //connection to client
+	clientInfo storageproto.Client  //info on client
 }
 
 func (c *serverData) Less(y interface{}) bool {
@@ -230,6 +231,7 @@ func (ss *Storageserver) AddToList(key string, element []byte) (int, os.Error) {
 }
 
 func (ss *Storageserver) RemoveFromList(key string, element []byte) (int, os.Error) {
+	//get server with user info
 	index := ss.GetIndex(key)
 	serv := ss.servers[index].(*serverData)
 
@@ -247,15 +249,22 @@ func (ss *Storageserver) RemoveFromList(key string, element []byte) (int, os.Err
 	return reply.Status, nil
 }
 
+/** function to get index in server array for the correct server 
+     based on the key given **/
 func (ss *Storageserver) GetIndex(key string) (int) {
+	//get userID
 	fields := strings.Split(key, ":")
 	user := fields[0]
 	h := fnv.New32()
 	h.Write([]byte(user))
 	hash := h.Sum32()
+
+	//get nodeid
 	pos := sort.Search(len(ss.servers), func(i int) bool { 
 		return ss.servers[i].(*serverData).clientInfo.NodeID >= hash 
 	})
+
+	//mod with server array size
 	return pos  % len(ss.servers)
 }
 
