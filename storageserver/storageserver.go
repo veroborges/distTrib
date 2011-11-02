@@ -13,20 +13,28 @@ import (
 	"net"
 	"json"
 	"container/vector"
+	"container/list"
 	"sort"
 	"container/list"
 )
 
+const (
+	QUERY_COUNT_SECONDS = 5  // Request lease if this is the 3rd+
+	QUERY_COUNT_THRESH = 3   // query in the last 5 seconds
+	LEASE_SECONDS = 5       // Leases are valid for 5 seconds
+	LEASE_GUARD_SECONDS = 1  // Servers add a short guard time
+)
 
 type Storageserver struct {
 	tm *storage.TribMap
 	leases *LeaseMap //stores the leases granted key -> leaselist
-	cache *storage.TribMap //local cache
-	requests *storage.TribMap
+
+	cacheLock sync.RWMutex
+ 	cacheInfo map[string] *cacheData
 
 	servers []interface{} //stores the existing storage servers
 	numnodes int
-	nodeid uint32
+	nodeData storageproto.Client
 	cond *sync.Cond
 	master string
 }
@@ -46,6 +54,11 @@ type LeaseRequest struct {
 	requestTime int64 
 }
 
+type cacheData struct {
+	leaseTime int64
+	requests *list.List
+}
+
 type serverData struct {
 	rpc *rpc.Client     //connection to client
 	clientInfo storageproto.Client  //info on client
@@ -61,11 +74,12 @@ func newLeaseMap() *LeaseMap {
 }
 
 func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *Storageserver {
-	ss := &Storageserver{storage.NewTribMap(), newLeaseMap(), nil, numnodes, nodeid, sync.NewCond(&sync.Mutex{}), master}
+	ss := &Storageserver{storage.NewTribMap(), newLeaseMap(), nil, numnodes, storageproto.Client{"", nodeid}, sync.NewCond(&sync.Mutex{}), master}
 	return ss
 }
 
 func (ss *Storageserver) Connect(addr net.Addr) {
+	ss.nodeData.HostPort = addr.String()
 	if (ss.numnodes == 0) {
 		log.Printf("Connecting as slave")
 		for {
@@ -75,7 +89,7 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 				time.Sleep(1000000000)
 			} else {
 				reply := new(storageproto.RegisterReply)
-				err = master.Call("StorageRPC.Register",&storageproto.RegisterArgs{storageproto.Client{addr.String(), ss.nodeid}}, reply)
+				err = master.Call("StorageRPC.Register",&storageproto.RegisterArgs{ss.nodeData}, reply)
 				if (err != nil) {
 					log.Printf("Something went wrong with the call; retrying")
 				} else if reply.Ready {
@@ -90,7 +104,7 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 		}
 	} else {
 		ss.servers = make([]interface{}, ss.numnodes)
-		ss.servers[ss.numnodes - 1] = &serverData{nil, storageproto.Client{addr.String(), ss.nodeid}}
+		ss.servers[ss.numnodes - 1] = &serverData{nil, ss.nodeData}
 		ss.numnodes--
 	}
 	ss.cond.L.Lock()
@@ -101,7 +115,7 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 	}
 	for i:=0; i < len(ss.servers); i++ {
 		server := ss.servers[i].(*serverData)
-		if server.clientInfo.NodeID == ss.nodeid {
+		if server.clientInfo.NodeID == ss.nodeData.NodeID {
 			continue
 		}
 		for {
@@ -275,19 +289,46 @@ func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
   	index := ss.GetIndex(key)
 	serv := ss.servers[index].(*serverData)
 	//if local server call server tribmap
-	if serv.clientInfo.NodeID == ss.nodeid {
+	if serv.clientInfo.NodeID == ss.nodeData.NodeID {
 		log.Printf("Getting from local storage")
 		res, stat := ss.tm.GET(key)
 		return res, stat, nil
 	}
+	ss.cacheLock.Lock()
+	defer ss.cacheLock.Unlock()
+	
+	data, ok := ss.cacheInfo[key]
+	if !ok {
+		data = &cacheData{0, list.NewList()}
+		ss.cacheInfo[key] = data
+	}
+	data.requests.Pushback(time.Nanoseconds())
+	if data.requests.Len() > QUERY_COUNT_THRESH {
+		data.requests.Remove(data.requests.Front())
+	}
+	if (data.leaseTime - time.Nanoseconds() > 0) {
+		res, stat := ss.cache.GET(key)
+		return res, stat, nil
+	}
+	
+	var requestLease bool = false
+	if (data.requests.Len() == QUERY_COUNT_THRESH &&  data.request.Back().Value.(int64) - data.request.Front().Value.(int64) <= QUERY_COUNT_SECONDS) {
+		requestLease = true
+	}
+	
 	log.Printf("Getting from %s", serv.clientInfo.HostPort)
 	//if not, call correct server via rpc
-	args := &storageproto.GetArgs{key}
+	args := &storageproto.GetArgs{key, requestLease, ss.nodeData}
 	reply := new(storageproto.GetReply)
 	err := serv.rpc.Call("StorageRPC.Get", args, reply)
 	if (err != nil) {
 		return nil, 0, err
 	}
+	if (reply.Lease.Granted) {
+		data.leaseTime = time.Nanoseconds() + reply.Lease.ValidSeconds * 1000000000
+		cache.Put(key, []byte(reply.Value))
+	}
+	
 	return []byte(reply.Value), reply.Status, nil
 }
 
@@ -296,7 +337,7 @@ func (ss *Storageserver) PUT(key string, val []byte) (int, os.Error) {
 	serv := ss.servers[index].(*serverData)
 
 	//if local server call server tribmap
-	if serv.clientInfo.NodeID == ss.nodeid {
+	if serv.clientInfo.NodeID == ss.nodeData.NodeID {
 		return ss.tm.PUT(key, val), nil
 	}
 	//if not, call correct server via rpc
@@ -314,7 +355,7 @@ func (ss *Storageserver) AddToList(key string, element []byte) (int, os.Error) {
 	serv := ss.servers[index].(*serverData)
 
 	//if local server call server tribmap
-	if serv.clientInfo.NodeID == ss.nodeid {
+	if serv.clientInfo.NodeID == ss.nodeData.NodeID {
 		return ss.tm.AddToList(key, element)
 	}
 	//if not, call correct server via rpc
@@ -333,7 +374,7 @@ func (ss *Storageserver) RemoveFromList(key string, element []byte) (int, os.Err
 	serv := ss.servers[index].(*serverData)
 
 	//if local server call server tribmap
-	if serv.clientInfo.NodeID == ss.nodeid {
+	if serv.clientInfo.NodeID == ss.nodeData.NodeID {
 		return ss.tm.RemoveFromList(key, element)
 	}
 	//if not, call correct server via rpc
