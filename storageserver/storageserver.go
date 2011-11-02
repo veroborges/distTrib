@@ -15,7 +15,6 @@ import (
 	"container/vector"
 	"container/list"
 	"sort"
-	"container/list"
 )
 
 const (
@@ -30,6 +29,7 @@ type Storageserver struct {
 	leases *LeaseMap //stores the leases granted key -> leaselist
 
 	cacheLock sync.RWMutex
+  cache *storage.TribMap
  	cacheInfo map[string] *cacheData
 
 	servers []interface{} //stores the existing storage servers
@@ -165,6 +165,8 @@ func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *sto
 }
 
 func (ss *Storageserver) handleLeaseRequest(args *storageproto.GetArgs, reply *storageproto.GetReply){
+   ss.leases.lock.Lock()
+	 defer ss.leases.lock.Unlock()
 
 		if _, present := ss.leases.data[args.Key]; !present {	
 				//make new list and insert lease request
@@ -173,18 +175,18 @@ func (ss *Storageserver) handleLeaseRequest(args *storageproto.GetArgs, reply *s
 				
 				//set reply lease struct
 				reply.LeaseStruct.Granted = true
-				reply.LeaseStruct.ValidSeconds = QUERY_COUNT_SECONDS
+				reply.LeaseStruct.ValidSeconds = LEASE_SECONDS
 
 		}else if ss.leases.data[args.Key].grantable == true{	
 				ss.leases.data[args.Key].list.push(&LeaseRequest{args.LeaseClient, time.Nanoseconds()})	
 	  		
 				//set reply lease struct
 				reply.LeaseStruct.Granted = true
-				reply.LeaseStruct.ValidSeconds = QUERY_COUNT_SECONDS
+				reply.LeaseStruct.ValidSeconds = LEASE_SECONDS
 	 	}else{
 				//set reply lease struct
 				reply.LeaseStruct.Granted = false
-				reply.LeaseStruct.ValidSeconds = QUERY_COUNT_SECONDS //do i need this?				 
+				reply.LeaseStruct.ValidSeconds = 0				 
 		} 
 }
 
@@ -232,10 +234,14 @@ func (ss *Storageserver) GetListRPC(args *storageproto.GetArgs, reply *storagepr
 }
 
 func (ss *StorageServer) handleModRequest(key string){
+  ss.leases.lock.Lock()
+	leaseRequest := ss.leases.data[key].list
 	ss.leases.data[key].grantable = false; //deny all other lease requests
+  ss.leases.data[key].list = list.New()
+  ss.leases.lock.Unlock()
 
 	//call RevokeLeaseReply to all lease holders
-	for lease := ss.leases.data[key].list.Front(); lease != nil; lease = lease.Next() {
+	for lease := leaseRequest.Front(); lease != nil; lease = lease.Next() {
 	
 		//wait for OK reply or until lease expires
 		while (time.NanoSeconds() - lease.requestTime) < (LEASE_SECONDS + LEASE_GUARD_SECONDS){
@@ -250,8 +256,9 @@ func (ss *StorageServer) handleModRequest(key string){
 		}
 	}
 
+  ss.leases.lock.Lock()
 	ss.leases.data[key].grantable = true 
-  ss.leases.data[key].list = list.New()
+  ss.leases.lock.Unlock()
 }
 
 
@@ -283,6 +290,15 @@ func (ss *Storageserver) RemoveFromListRPC(args *storageproto.PutArgs, reply *st
 	status, err := ss.tm.RemoveFromList(args.Key, []byte(args.Value))
 	reply.Status = status
 	return err
+}
+
+func (ss *Storageserver) RevokeLeaseRPC(args *storageproto.RevokeLeaseArgs, reply *storageproto.RevokeLeaseReply) os.Error {
+	ss.cacheLock.Lock()
+	defer ss.cacheLock.Unlock()
+
+	cacheInfo[args.Key] = nil, false
+	
+	reply.Status = storageproto.OK
 }
 
 func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
