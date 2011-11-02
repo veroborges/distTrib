@@ -19,6 +19,10 @@ import (
 
 type Storageserver struct {
 	tm *storage.TribMap
+	leases *storage.TribMap //stores the leases granted
+	cache *storage.TribMap //local cache
+	requests *storage.TribMap
+
 	servers []interface{} //stores the existing storage servers
 	numnodes int
 	nodeid uint32
@@ -37,7 +41,7 @@ func (c *serverData) Less(y interface{}) bool {
 
 
 func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *Storageserver {
-	ss := &Storageserver{storage.NewTribMap(), nil, numnodes, nodeid, sync.NewCond(&sync.Mutex{}), master}
+	ss := &Storageserver{storage.NewTribMap(), storage.newTribMap(), nil, numnodes, nodeid, sync.NewCond(&sync.Mutex{}), master}
 	return ss
 }
 
@@ -137,7 +141,7 @@ func (ss *Storageserver) GetRPC(args *storageproto.GetArgs, reply *storageproto.
 }
 
 func (ss *Storageserver) GetListRPC(args *storageproto.GetArgs, reply *storageproto.GetListReply) os.Error {
-	val, status := ss.tm.GET(args.Key)
+	val, status := ss.tm.GET(args.Key, args.WantLease, args.LeaseClient)
 	reply.Status = status
 	if (status == storageproto.OK) {
 		set := make(map[string] bool)
