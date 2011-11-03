@@ -254,7 +254,7 @@ func (ss *Storageserver) handleModRequest(key string){
 
 	//call RevokeLeaseReply to all lease holders
 	for leaseElement := leaseRequest.Front(); leaseElement != nil; leaseElement = leaseElement.Next() {
-		lease := leaseElement.Value.(LeaseRequest)
+		lease := leaseElement.Value.(*LeaseRequest)
 		//wait for OK reply or until lease expires
 		for (time.Nanoseconds() - lease.requestTime) < (LEASE_SECONDS + LEASE_GUARD_SECONDS) * 1000000000 {
 			reply := new(storageproto.RevokeLeaseReply)
@@ -337,13 +337,15 @@ func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
 		data.requests.Remove(data.requests.Front())
 	}
 	if (data.leaseTime - time.Nanoseconds() > 0) {
+		log.Printf("Getting from cache %s", key);
 		res, stat := ss.cache.cache.GET(key)
 		return res, stat, nil
 	}
-	
+	log.Printf("Request len %d for %s", data.requests.Len(), key)
 	var requestLease bool = false
-	if (data.requests.Len() >= QUERY_COUNT_THRESH && data.requests.Back().Value.(int64) - data.requests.Front().Value.(int64) <= QUERY_COUNT_SECONDS) {
+	if (data.requests.Len() >= QUERY_COUNT_THRESH && data.requests.Back().Value.(int64) - data.requests.Front().Value.(int64) <= QUERY_COUNT_SECONDS * 1000000000) {
 		requestLease = true
+		log.Printf("Requesting lease for %s", key)
 	}
 	
 	log.Printf("Getting from %s", serv.clientInfo.HostPort)
@@ -357,6 +359,7 @@ func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
 	if (reply.Lease.Granted) {
 		data.leaseTime = time.Nanoseconds() + int64(reply.Lease.ValidSeconds * 1000000000)
 		ss.cache.cache.PUT(key, []byte(reply.Value))
+		log.Printf("Adding to cache %s", key)
 	}
 	
 	return []byte(reply.Value), reply.Status, nil
