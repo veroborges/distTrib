@@ -29,10 +29,11 @@ type Storageserver struct {
 	leases *LeaseMap //stores the leases granted key -> leaselist
 
 	cacheLock sync.RWMutex
-  cache *storage.TribMap
+    cache *storage.TribMap
  	cacheInfo map[string] *cacheData
 
 	servers []interface{} //stores the existing storage servers
+	serversMap map[int32] *serverData
 	numnodes int
 	nodeData storageproto.Client
 	cond *sync.Cond
@@ -96,6 +97,7 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 					ss.servers = make([]interface{}, len(reply.Clients))
 					for i:=0; i < len(reply.Clients); i++ {
 						ss.servers[i] = &serverData{nil, reply.Clients[i]}
+						ss.serversMap[reply.Clients[i].NodeID] = ss.servers[i]
 					}
 					break
 				}
@@ -105,6 +107,7 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 	} else {
 		ss.servers = make([]interface{}, ss.numnodes)
 		ss.servers[ss.numnodes - 1] = &serverData{nil, ss.nodeData}
+		ss.serversMap[ss.nodeData.NodeID] = ss.servers[ss.numnodes - 1]
 		ss.numnodes--
 	}
 	ss.cond.L.Lock()
@@ -151,6 +154,7 @@ func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *sto
 		server := &serverData{}
 		server.clientInfo = args.ClientInfo
 		ss.servers[ss.numnodes - 1] = server
+		ss.serversMap[server.clientInfo.NodeID] = server
 		ss.numnodes--
 	}
 	if (ss.numnodes == 0) {
@@ -165,7 +169,7 @@ func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *sto
 }
 
 func (ss *Storageserver) handleLeaseRequest(args *storageproto.GetArgs, reply *storageproto.GetReply){
-   ss.leases.lock.Lock()
+     ss.leases.lock.Lock()
 	 defer ss.leases.lock.Unlock()
 
 		if _, present := ss.leases.data[args.Key]; !present {	
@@ -328,7 +332,7 @@ func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
 	}
 	
 	var requestLease bool = false
-	if (data.requests.Len() == QUERY_COUNT_THRESH &&  data.request.Back().Value.(int64) - data.request.Front().Value.(int64) <= QUERY_COUNT_SECONDS) {
+	if (data.requests.Len() >= QUERY_COUNT_THRESH && data.request.Back().Value.(int64) - data.request.Front().Value.(int64) <= QUERY_COUNT_SECONDS) {
 		requestLease = true
 	}
 	
