@@ -11,9 +11,14 @@ var tests = []testing.InternalTest{
 	{"server.TestDialServer", server.TestDialServer},
 	{"server.TestCreateUser", server.TestCreateUser},
 	{"server.TestCreateTwice", server.TestCreateTwice},
+	{"server.TestSubUnsubSlam", server.TestSubUnsubSlam},
 	{"server.TestCreateSlam", server.TestCreateSlam},
 	{"server.TestConcurrentCreateSlam", server.TestConcurrentCreateSlam},
 	{"server.TestEvil", server.TestEvil},
+	{"server.TestTwoServers", server.TestTwoServers},
+	{"server.TestSixServers", server.TestSixServers},
+	{"server.TestBigBad", server.TestBigBad},
+	{"server.TestBrokenCaching", server.TestBrokenCaching},
 }
 
 var benchmarks = []testing.InternalBenchmark{

@@ -33,15 +33,20 @@ func (ts *Tribserver) CreateUser(args *tribproto.CreateUserArgs, reply *tribprot
 
 	//return if exists already
 	if stat == storageproto.OK {
+		log.Printf("create user: user already exists")
 		reply.Status = tribproto.EEXISTS
 
 	} else  {
+		log.Printf("Creating new user")
 		//initialize the 3 maps for the user
 		val, _ := json.Marshal(0)
 		ts.tm.PUT(args.Userid + LAST, val)
 		val, _ = json.Marshal(make(map[string] bool))
 		ts.tm.PUT(args.Userid + SUBSCRIPTIONS, val)
+		log.Printf("FInished creating new user %s", args.Userid)
 	}
+
+	log.Printf("returning nil from create user")
 	return nil
 }
 
@@ -65,7 +70,13 @@ func (ts *Tribserver) AddSubscription(args *tribproto.SubscriptionArgs, reply *t
 				return err
 			}
 			//add suscription to user's list
-			ts.tm.AddToList(args.Userid + SUBSCRIPTIONS, val)
+			status, err := ts.tm.AddToList(args.Userid + SUBSCRIPTIONS, val)
+			if (err != nil){
+				return err
+			}else if status == storageproto.EITEMEXISTS{
+				reply.Status = tribproto.EEXISTS
+			}
+
 		} else {
 			reply.Status = tribproto.ENOSUCHTARGETUSER
 		}
@@ -313,7 +324,7 @@ func NewTribserver(ss *storageserver.Storageserver) *Tribserver {
 
 var portnum *int = flag.Int("port", 9009, "port # to listen on")
 var storageMasterNodePort *string = flag.String("master", "localhost:9009", "Storage master node")
-var numNodes *int = flag.Int("N", 1, "Become the master.  Specifies the number of nodes in the system, including the master")
+var numNodes *int = flag.Int("N", 0, "Become the master.  Specifies the number of nodes in the system, including the master")
 var nodeID *uint = flag.Uint("id", 0, "The node ID to use for consistent hashing.  Should be a 32 bit number.")
 
 func main() {

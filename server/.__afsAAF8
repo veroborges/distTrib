@@ -1,0 +1,715 @@
+2011/11/03 17:05:51 Server starting on port 49192
+2011/11/03 17:05:51 Establishing connection with storage servers
+2011/11/03 17:05:51 Connecting as slave
+2011/11/03 17:05:51 Connecting to other servers
+2011/11/03 17:05:51 Made connection to [::]:49191
+2011/11/03 17:05:51 server &{0xf8400d04e0 {[::]:49191 384225303}}
+2011/11/03 17:05:51 server &{<nil> {[::]:49192 712679749}}
+2011/11/03 17:05:54 Getting from local storage based on rpc req
+2011/11/03 17:05:54 Getting from local storage based on rpc req
+2011/11/03 17:05:54 Getting from local storage based on rpc req
+2011/11/03 17:05:54 Getting from local storage
+2011/11/03 17:05:54 Server starting on port 29913
+2011/11/03 17:05:54 Establishing connection with storage servers
+2011/11/03 17:05:54 Connecting as slave
+2011/11/03 17:05:55 Connecting to other servers
+2011/11/03 17:05:55 Made connection to [::]:29914
+2011/11/03 17:05:55 Made connection to [::]:29916
+2011/11/03 17:05:55 Made connection to [::]:29915
+2011/11/03 17:05:55 Made connection to [::]:29912
+2011/11/03 17:05:55 Made connection to [::]:29917
+2011/11/03 17:05:55 server &{0xf8400ed4e0 {[::]:29914 928976417}}
+2011/11/03 17:05:55 server &{0xf8400ed7e0 {[::]:29916 955213133}}
+2011/11/03 17:05:55 server &{0xf8400edae0 {[::]:29915 986451208}}
+2011/11/03 17:05:55 server &{<nil> {[::]:29913 2287090686}}
+2011/11/03 17:05:55 server &{0xf8400f4de0 {[::]:29912 2509119999}}
+2011/11/03 17:05:55 server &{0xf84010e120 {[::]:29917 3133453675}}
+2011/11/03 17:05:57 Getting from local storage based on rpc req
+2011/11/03 17:05:57 Getting from local storage based on rpc req
+2011/11/03 17:05:57 Request len 1 for dga:subscriptions
+2011/11/03 17:05:57 Getting from [::]:29914
+2011/11/03 17:05:57 Server starting on port 45381
+2011/11/03 17:05:57 Establishing connection with storage servers
+2011/11/03 17:05:57 Connecting as slave
+2011/11/03 17:05:58 Connecting to other servers
+2011/11/03 17:05:58 Made connection to [::]:45380
+2011/11/03 17:05:58 Made connection to [::]:45382
+2011/11/03 17:05:58 Made connection to [::]:45383
+2011/11/03 17:05:58 server &{0xf84009a060 {[::]:45380 235031904}}
+2011/11/03 17:05:58 server &{0xf84010c4e0 {[::]:45382 493746171}}
+2011/11/03 17:05:58 server &{<nil> {[::]:45381 827810244}}
+2011/11/03 17:05:58 server &{0xf84009ad20 {[::]:45383 3512913425}}
+2011/11/03 17:06:00 Request len 1 for a:last
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for b:last
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for c:last
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for e:last
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for a:last
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for a:4
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for a:3
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for a:2
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for a:1
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 3 for a:last
+2011/11/03 17:06:00 Requesting lease for a:last
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache a:last
+2011/11/03 17:06:00 Request len 2 for a:4
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for a:3
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for a:2
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for a:1
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Getting from cache a:last
+2011/11/03 17:06:00 Request len 3 for a:4
+2011/11/03 17:06:00 Requesting lease for a:4
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache a:4
+2011/11/03 17:06:00 Request len 3 for a:3
+2011/11/03 17:06:00 Requesting lease for a:3
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache a:3
+2011/11/03 17:06:00 Request len 3 for a:2
+2011/11/03 17:06:00 Requesting lease for a:2
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache a:2
+2011/11/03 17:06:00 Request len 3 for a:1
+2011/11/03 17:06:00 Requesting lease for a:1
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache a:1
+2011/11/03 17:06:00 Getting from cache a:last
+2011/11/03 17:06:00 Getting from cache a:4
+2011/11/03 17:06:00 Getting from cache a:3
+2011/11/03 17:06:00 Getting from cache a:2
+2011/11/03 17:06:00 Getting from cache a:1
+2011/11/03 17:06:00 Getting from cache a:last
+2011/11/03 17:06:00 Getting from cache a:4
+2011/11/03 17:06:00 Getting from cache a:3
+2011/11/03 17:06:00 Getting from cache a:2
+2011/11/03 17:06:00 Getting from cache a:1
+2011/11/03 17:06:00 Getting from cache a:last
+2011/11/03 17:06:00 Getting from cache a:4
+2011/11/03 17:06:00 Getting from cache a:3
+2011/11/03 17:06:00 Getting from cache a:2
+2011/11/03 17:06:00 Getting from cache a:1
+2011/11/03 17:06:00 Request len 2 for b:last
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for b:4
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for b:3
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for b:2
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for b:1
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 3 for b:last
+2011/11/03 17:06:00 Requesting lease for b:last
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache b:last
+2011/11/03 17:06:00 Request len 2 for b:4
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for b:3
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for b:2
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for b:1
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Getting from cache b:last
+2011/11/03 17:06:00 Request len 3 for b:4
+2011/11/03 17:06:00 Requesting lease for b:4
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache b:4
+2011/11/03 17:06:00 Request len 3 for b:3
+2011/11/03 17:06:00 Requesting lease for b:3
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache b:3
+2011/11/03 17:06:00 Request len 3 for b:2
+2011/11/03 17:06:00 Requesting lease for b:2
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache b:2
+2011/11/03 17:06:00 Request len 3 for b:1
+2011/11/03 17:06:00 Requesting lease for b:1
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache b:1
+2011/11/03 17:06:00 Getting from cache b:last
+2011/11/03 17:06:00 Getting from cache b:4
+2011/11/03 17:06:00 Getting from cache b:3
+2011/11/03 17:06:00 Getting from cache b:2
+2011/11/03 17:06:00 Getting from cache b:1
+2011/11/03 17:06:00 Getting from cache b:last
+2011/11/03 17:06:00 Getting from cache b:4
+2011/11/03 17:06:00 Getting from cache b:3
+2011/11/03 17:06:00 Getting from cache b:2
+2011/11/03 17:06:00 Getting from cache b:1
+2011/11/03 17:06:00 Getting from cache b:last
+2011/11/03 17:06:00 Getting from cache b:4
+2011/11/03 17:06:00 Getting from cache b:3
+2011/11/03 17:06:00 Getting from cache b:2
+2011/11/03 17:06:00 Getting from cache b:1
+2011/11/03 17:06:00 Request len 2 for c:last
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for c:4
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for c:3
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for c:2
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for c:1
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 3 for c:last
+2011/11/03 17:06:00 Requesting lease for c:last
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache c:last
+2011/11/03 17:06:00 Request len 2 for c:4
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for c:3
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for c:2
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for c:1
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Getting from cache c:last
+2011/11/03 17:06:00 Request len 3 for c:4
+2011/11/03 17:06:00 Requesting lease for c:4
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache c:4
+2011/11/03 17:06:00 Request len 3 for c:3
+2011/11/03 17:06:00 Requesting lease for c:3
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache c:3
+2011/11/03 17:06:00 Request len 3 for c:2
+2011/11/03 17:06:00 Requesting lease for c:2
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache c:2
+2011/11/03 17:06:00 Request len 3 for c:1
+2011/11/03 17:06:00 Requesting lease for c:1
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache c:1
+2011/11/03 17:06:00 Getting from cache c:last
+2011/11/03 17:06:00 Getting from cache c:4
+2011/11/03 17:06:00 Getting from cache c:3
+2011/11/03 17:06:00 Getting from cache c:2
+2011/11/03 17:06:00 Getting from cache c:1
+2011/11/03 17:06:00 Getting from cache c:last
+2011/11/03 17:06:00 Getting from cache c:4
+2011/11/03 17:06:00 Getting from cache c:3
+2011/11/03 17:06:00 Getting from cache c:2
+2011/11/03 17:06:00 Getting from cache c:1
+2011/11/03 17:06:00 Getting from cache c:last
+2011/11/03 17:06:00 Getting from cache c:4
+2011/11/03 17:06:00 Getting from cache c:3
+2011/11/03 17:06:00 Getting from cache c:2
+2011/11/03 17:06:00 Getting from cache c:1
+2011/11/03 17:06:00 Request len 1 for d:last
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for d:4
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for d:3
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for d:2
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for d:1
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for d:last
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for d:4
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for d:3
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for d:2
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for d:1
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 3 for d:last
+2011/11/03 17:06:00 Requesting lease for d:last
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache d:last
+2011/11/03 17:06:00 Request len 3 for d:4
+2011/11/03 17:06:00 Requesting lease for d:4
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache d:4
+2011/11/03 17:06:00 Request len 3 for d:3
+2011/11/03 17:06:00 Requesting lease for d:3
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache d:3
+2011/11/03 17:06:00 Request len 3 for d:2
+2011/11/03 17:06:00 Requesting lease for d:2
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache d:2
+2011/11/03 17:06:00 Request len 3 for d:1
+2011/11/03 17:06:00 Requesting lease for d:1
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache d:1
+2011/11/03 17:06:00 Getting from cache d:last
+2011/11/03 17:06:00 Getting from cache d:4
+2011/11/03 17:06:00 Getting from cache d:3
+2011/11/03 17:06:00 Getting from cache d:2
+2011/11/03 17:06:00 Getting from cache d:1
+2011/11/03 17:06:00 Getting from cache d:last
+2011/11/03 17:06:00 Getting from cache d:4
+2011/11/03 17:06:00 Getting from cache d:3
+2011/11/03 17:06:00 Getting from cache d:2
+2011/11/03 17:06:00 Getting from cache d:1
+2011/11/03 17:06:00 Getting from cache d:last
+2011/11/03 17:06:00 Getting from cache d:4
+2011/11/03 17:06:00 Getting from cache d:3
+2011/11/03 17:06:00 Getting from cache d:2
+2011/11/03 17:06:00 Getting from cache d:1
+2011/11/03 17:06:00 Request len 2 for e:last
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for e:4
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for e:3
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for e:2
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 1 for e:1
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 3 for e:last
+2011/11/03 17:06:00 Requesting lease for e:last
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache e:last
+2011/11/03 17:06:00 Request len 2 for e:4
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for e:3
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for e:2
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Request len 2 for e:1
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Getting from cache e:last
+2011/11/03 17:06:00 Request len 3 for e:4
+2011/11/03 17:06:00 Requesting lease for e:4
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache e:4
+2011/11/03 17:06:00 Request len 3 for e:3
+2011/11/03 17:06:00 Requesting lease for e:3
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache e:3
+2011/11/03 17:06:00 Request len 3 for e:2
+2011/11/03 17:06:00 Requesting lease for e:2
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache e:2
+2011/11/03 17:06:00 Request len 3 for e:1
+2011/11/03 17:06:00 Requesting lease for e:1
+2011/11/03 17:06:00 Getting from [::]:45380
+2011/11/03 17:06:00 Adding to cache e:1
+2011/11/03 17:06:00 Getting from cache e:last
+2011/11/03 17:06:00 Getting from cache e:4
+2011/11/03 17:06:00 Getting from cache e:3
+2011/11/03 17:06:00 Getting from cache e:2
+2011/11/03 17:06:00 Getting from cache e:1
+2011/11/03 17:06:00 Getting from cache e:last
+2011/11/03 17:06:00 Getting from cache e:4
+2011/11/03 17:06:00 Getting from cache e:3
+2011/11/03 17:06:00 Getting from cache e:2
+2011/11/03 17:06:00 Getting from cache e:1
+2011/11/03 17:06:00 Getting from cache e:last
+2011/11/03 17:06:00 Getting from cache e:4
+2011/11/03 17:06:00 Getting from cache e:3
+2011/11/03 17:06:00 Getting from cache e:2
+2011/11/03 17:06:00 Getting from cache e:1
+2011/11/03 17:06:01 Server starting on port 55743
+2011/11/03 17:06:01 Establishing connection with storage servers
+2011/11/03 17:06:01 Connecting as slave
+2011/11/03 17:06:01 Connecting to other servers
+2011/11/03 17:06:01 Made connection to [::]:55742
+2011/11/03 17:06:01 server &{0xf8400cdde0 {[::]:55742 2192193197}}
+2011/11/03 17:06:01 server &{<nil> {[::]:55743 2767959122}}
+2011/11/03 17:06:04 Request len 1 for a:last
+2011/11/03 17:06:04 Getting from [::]:55742
+2011/11/03 17:06:04 Request len 1 for a:1
+2011/11/03 17:06:04 Getting from [::]:55742
+2011/11/03 17:06:04 Request len 2 for a:last
+2011/11/03 17:06:04 Getting from [::]:55742
+2011/11/03 17:06:04 Request len 2 for a:1
+2011/11/03 17:06:04 Getting from [::]:55742
+2011/11/03 17:06:04 Request len 3 for a:last
+2011/11/03 17:06:04 Requesting lease for a:last
+2011/11/03 17:06:04 Getting from [::]:55742
+2011/11/03 17:06:04 Adding to cache a:last
+2011/11/03 17:06:04 Request len 3 for a:1
+2011/11/03 17:06:04 Requesting lease for a:1
+2011/11/03 17:06:04 Getting from [::]:55742
+2011/11/03 17:06:04 Adding to cache a:1
+2011/11/03 17:06:04 Getting from cache a:last
+2011/11/03 17:06:04 Getting from cache a:1
+2011/11/03 17:06:04 Getting from cache a:last
+2011/11/03 17:06:04 Getting from cache a:1
+2011/11/03 17:06:04 Getting from cache a:last
+2011/11/03 17:06:04 Getting from cache a:1
+2011/11/03 17:06:04 Getting from cache a:last
+2011/11/03 17:06:04 Getting from cache a:1
+2011/11/03 17:08:11 Server starting on port 26936
+2011/11/03 17:08:11 Establishing connection with storage servers
+2011/11/03 17:08:11 Connecting as slave
+2011/11/03 17:08:11 Connecting to other servers
+2011/11/03 17:08:11 Made connection to [::]:26935
+2011/11/03 17:08:11 server &{<nil> {[::]:26936 1504809504}}
+2011/11/03 17:08:11 server &{0xf8400ea180 {[::]:26935 4275571333}}
+2011/11/03 17:08:14 Getting from local storage based on rpc req
+2011/11/03 17:08:14 Getting from local storage based on rpc req
+2011/11/03 17:08:14 Getting from local storage based on rpc req
+2011/11/03 17:08:14 Getting from local storage
+2011/11/03 17:08:14 Server starting on port 10992
+2011/11/03 17:08:14 Establishing connection with storage servers
+2011/11/03 17:08:14 Connecting as slave
+2011/11/03 17:08:15 Connecting to other servers
+2011/11/03 17:08:15 Made connection to [::]:10996
+2011/11/03 17:08:15 Made connection to [::]:10994
+2011/11/03 17:08:15 Made connection to [::]:10995
+2011/11/03 17:08:15 Made connection to [::]:10993
+2011/11/03 17:08:15 Made connection to [::]:10991
+2011/11/03 17:08:15 server &{<nil> {[::]:10992 702910260}}
+2011/11/03 17:08:15 server &{0xf84002e840 {[::]:10996 793449405}}
+2011/11/03 17:08:15 server &{0xf8400ffd20 {[::]:10994 2396804099}}
+2011/11/03 17:08:15 server &{0xf84010e180 {[::]:10995 3154381779}}
+2011/11/03 17:08:15 server &{0xf8400ff4e0 {[::]:10993 3457133177}}
+2011/11/03 17:08:15 server &{0xf8400ff720 {[::]:10991 4124353193}}
+2011/11/03 17:08:17 Getting from local storage based on rpc req
+2011/11/03 17:08:17 Getting from local storage based on rpc req
+2011/11/03 17:08:17 Getting from local storage based on rpc req
+2011/11/03 17:08:17 Getting from local storage
+2011/11/03 17:08:17 Getting from local storage based on rpc req
+2011/11/03 17:08:17 Getting from local storage based on rpc req
+2011/11/03 17:08:17 Getting from local storage based on rpc req
+2011/11/03 17:08:17 Getting from local storage based on rpc req
+2011/11/03 17:08:17 Server starting on port 50676
+2011/11/03 17:08:17 Establishing connection with storage servers
+2011/11/03 17:08:17 Connecting as slave
+2011/11/03 17:08:18 Connecting to other servers
+2011/11/03 17:08:18 Made connection to [::]:50675
+2011/11/03 17:08:18 Made connection to [::]:50677
+2011/11/03 17:08:18 Made connection to [::]:50678
+2011/11/03 17:08:18 server &{0xf840110180 {[::]:50675 1567345172}}
+2011/11/03 17:08:18 server &{0xf840110480 {[::]:50677 3172086514}}
+2011/11/03 17:08:18 server &{0xf84009a060 {[::]:50678 3337469918}}
+2011/11/03 17:08:18 server &{<nil> {[::]:50676 3944563781}}
+2011/11/03 17:08:20 Request len 1 for a:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for b:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for c:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for d:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for d:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 3 for d:last
+2011/11/03 17:08:20 Requesting lease for d:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache d:last
+2011/11/03 17:08:20 Revoking key d:last
+2011/11/03 17:08:20 Request len 1 for e:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for a:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for a:4
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for a:3
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for a:2
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for a:1
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 3 for a:last
+2011/11/03 17:08:20 Requesting lease for a:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache a:last
+2011/11/03 17:08:20 Request len 2 for a:4
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for a:3
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for a:2
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for a:1
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Getting from cache a:last
+2011/11/03 17:08:20 Request len 3 for a:4
+2011/11/03 17:08:20 Requesting lease for a:4
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache a:4
+2011/11/03 17:08:20 Request len 3 for a:3
+2011/11/03 17:08:20 Requesting lease for a:3
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache a:3
+2011/11/03 17:08:20 Request len 3 for a:2
+2011/11/03 17:08:20 Requesting lease for a:2
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache a:2
+2011/11/03 17:08:20 Request len 3 for a:1
+2011/11/03 17:08:20 Requesting lease for a:1
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache a:1
+2011/11/03 17:08:20 Getting from cache a:last
+2011/11/03 17:08:20 Getting from cache a:4
+2011/11/03 17:08:20 Getting from cache a:3
+2011/11/03 17:08:20 Getting from cache a:2
+2011/11/03 17:08:20 Getting from cache a:1
+2011/11/03 17:08:20 Getting from cache a:last
+2011/11/03 17:08:20 Getting from cache a:4
+2011/11/03 17:08:20 Getting from cache a:3
+2011/11/03 17:08:20 Getting from cache a:2
+2011/11/03 17:08:20 Getting from cache a:1
+2011/11/03 17:08:20 Getting from cache a:last
+2011/11/03 17:08:20 Getting from cache a:4
+2011/11/03 17:08:20 Getting from cache a:3
+2011/11/03 17:08:20 Getting from cache a:2
+2011/11/03 17:08:20 Getting from cache a:1
+2011/11/03 17:08:20 Request len 2 for b:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for b:4
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for b:3
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for b:2
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for b:1
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 3 for b:last
+2011/11/03 17:08:20 Requesting lease for b:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache b:last
+2011/11/03 17:08:20 Request len 2 for b:4
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for b:3
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for b:2
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for b:1
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Getting from cache b:last
+2011/11/03 17:08:20 Request len 3 for b:4
+2011/11/03 17:08:20 Requesting lease for b:4
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache b:4
+2011/11/03 17:08:20 Request len 3 for b:3
+2011/11/03 17:08:20 Requesting lease for b:3
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache b:3
+2011/11/03 17:08:20 Request len 3 for b:2
+2011/11/03 17:08:20 Requesting lease for b:2
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache b:2
+2011/11/03 17:08:20 Request len 3 for b:1
+2011/11/03 17:08:20 Requesting lease for b:1
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache b:1
+2011/11/03 17:08:20 Getting from cache b:last
+2011/11/03 17:08:20 Getting from cache b:4
+2011/11/03 17:08:20 Getting from cache b:3
+2011/11/03 17:08:20 Getting from cache b:2
+2011/11/03 17:08:20 Getting from cache b:1
+2011/11/03 17:08:20 Getting from cache b:last
+2011/11/03 17:08:20 Getting from cache b:4
+2011/11/03 17:08:20 Getting from cache b:3
+2011/11/03 17:08:20 Getting from cache b:2
+2011/11/03 17:08:20 Getting from cache b:1
+2011/11/03 17:08:20 Getting from cache b:last
+2011/11/03 17:08:20 Getting from cache b:4
+2011/11/03 17:08:20 Getting from cache b:3
+2011/11/03 17:08:20 Getting from cache b:2
+2011/11/03 17:08:20 Getting from cache b:1
+2011/11/03 17:08:20 Request len 2 for c:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for c:4
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for c:3
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for c:2
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for c:1
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 3 for c:last
+2011/11/03 17:08:20 Requesting lease for c:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache c:last
+2011/11/03 17:08:20 Request len 2 for c:4
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for c:3
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for c:2
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for c:1
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Getting from cache c:last
+2011/11/03 17:08:20 Request len 3 for c:4
+2011/11/03 17:08:20 Requesting lease for c:4
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache c:4
+2011/11/03 17:08:20 Request len 3 for c:3
+2011/11/03 17:08:20 Requesting lease for c:3
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache c:3
+2011/11/03 17:08:20 Request len 3 for c:2
+2011/11/03 17:08:20 Requesting lease for c:2
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache c:2
+2011/11/03 17:08:20 Request len 3 for c:1
+2011/11/03 17:08:20 Requesting lease for c:1
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache c:1
+2011/11/03 17:08:20 Getting from cache c:last
+2011/11/03 17:08:20 Getting from cache c:4
+2011/11/03 17:08:20 Getting from cache c:3
+2011/11/03 17:08:20 Getting from cache c:2
+2011/11/03 17:08:20 Getting from cache c:1
+2011/11/03 17:08:20 Getting from cache c:last
+2011/11/03 17:08:20 Getting from cache c:4
+2011/11/03 17:08:20 Getting from cache c:3
+2011/11/03 17:08:20 Getting from cache c:2
+2011/11/03 17:08:20 Getting from cache c:1
+2011/11/03 17:08:20 Getting from cache c:last
+2011/11/03 17:08:20 Getting from cache c:4
+2011/11/03 17:08:20 Getting from cache c:3
+2011/11/03 17:08:20 Getting from cache c:2
+2011/11/03 17:08:20 Getting from cache c:1
+2011/11/03 17:08:20 Request len 1 for d:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for d:4
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for d:3
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for d:2
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for d:1
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for d:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for d:4
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for d:3
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for d:2
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for d:1
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 3 for d:last
+2011/11/03 17:08:20 Requesting lease for d:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache d:last
+2011/11/03 17:08:20 Request len 3 for d:4
+2011/11/03 17:08:20 Requesting lease for d:4
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache d:4
+2011/11/03 17:08:20 Request len 3 for d:3
+2011/11/03 17:08:20 Requesting lease for d:3
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache d:3
+2011/11/03 17:08:20 Request len 3 for d:2
+2011/11/03 17:08:20 Requesting lease for d:2
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache d:2
+2011/11/03 17:08:20 Request len 3 for d:1
+2011/11/03 17:08:20 Requesting lease for d:1
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache d:1
+2011/11/03 17:08:20 Getting from cache d:last
+2011/11/03 17:08:20 Getting from cache d:4
+2011/11/03 17:08:20 Getting from cache d:3
+2011/11/03 17:08:20 Getting from cache d:2
+2011/11/03 17:08:20 Getting from cache d:1
+2011/11/03 17:08:20 Getting from cache d:last
+2011/11/03 17:08:20 Getting from cache d:4
+2011/11/03 17:08:20 Getting from cache d:3
+2011/11/03 17:08:20 Getting from cache d:2
+2011/11/03 17:08:20 Getting from cache d:1
+2011/11/03 17:08:20 Getting from cache d:last
+2011/11/03 17:08:20 Getting from cache d:4
+2011/11/03 17:08:20 Getting from cache d:3
+2011/11/03 17:08:20 Getting from cache d:2
+2011/11/03 17:08:20 Getting from cache d:1
+2011/11/03 17:08:20 Request len 2 for e:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for e:4
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for e:3
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for e:2
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 1 for e:1
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 3 for e:last
+2011/11/03 17:08:20 Requesting lease for e:last
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache e:last
+2011/11/03 17:08:20 Request len 2 for e:4
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for e:3
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for e:2
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Request len 2 for e:1
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Getting from cache e:last
+2011/11/03 17:08:20 Request len 3 for e:4
+2011/11/03 17:08:20 Requesting lease for e:4
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache e:4
+2011/11/03 17:08:20 Request len 3 for e:3
+2011/11/03 17:08:20 Requesting lease for e:3
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache e:3
+2011/11/03 17:08:20 Request len 3 for e:2
+2011/11/03 17:08:20 Requesting lease for e:2
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache e:2
+2011/11/03 17:08:20 Request len 3 for e:1
+2011/11/03 17:08:20 Requesting lease for e:1
+2011/11/03 17:08:20 Getting from [::]:50675
+2011/11/03 17:08:20 Adding to cache e:1
+2011/11/03 17:08:20 Getting from cache e:last
+2011/11/03 17:08:20 Getting from cache e:4
+2011/11/03 17:08:20 Getting from cache e:3
+2011/11/03 17:08:20 Getting from cache e:2
+2011/11/03 17:08:20 Getting from cache e:1
+2011/11/03 17:08:20 Getting from cache e:last
+2011/11/03 17:08:20 Getting from cache e:4
+2011/11/03 17:08:20 Getting from cache e:3
+2011/11/03 17:08:20 Getting from cache e:2
+2011/11/03 17:08:20 Getting from cache e:1
+2011/11/03 17:08:20 Getting from cache e:last
+2011/11/03 17:08:20 Getting from cache e:4
+2011/11/03 17:08:20 Getting from cache e:3
+2011/11/03 17:08:20 Getting from cache e:2
+2011/11/03 17:08:20 Getting from cache e:1
+2011/11/03 17:08:20 Server starting on port 43497
+2011/11/03 17:08:20 Establishing connection with storage servers
+2011/11/03 17:08:20 Connecting as slave
+2011/11/03 17:08:20 Connecting to other servers
+2011/11/03 17:08:20 Made connection to [::]:43496
+2011/11/03 17:08:20 server &{0xf8400d36c0 {[::]:43496 1479618726}}
+2011/11/03 17:08:20 server &{<nil> {[::]:43497 2820105319}}
+2011/11/03 17:08:23 Request len 1 for a:last
+2011/11/03 17:08:23 Getting from [::]:43496
+2011/11/03 17:08:23 Request len 1 for a:1
+2011/11/03 17:08:23 Getting from [::]:43496
+2011/11/03 17:08:23 Request len 2 for a:last
+2011/11/03 17:08:23 Getting from [::]:43496
+2011/11/03 17:08:23 Request len 2 for a:1
+2011/11/03 17:08:23 Getting from [::]:43496
+2011/11/03 17:08:23 Request len 3 for a:last
+2011/11/03 17:08:23 Requesting lease for a:last
+2011/11/03 17:08:23 Getting from [::]:43496
+2011/11/03 17:08:23 Adding to cache a:last
+2011/11/03 17:08:23 Request len 3 for a:1
+2011/11/03 17:08:23 Requesting lease for a:1
+2011/11/03 17:08:23 Getting from [::]:43496
+2011/11/03 17:08:23 Adding to cache a:1
+2011/11/03 17:08:23 Getting from cache a:last
+2011/11/03 17:08:23 Getting from cache a:1
+2011/11/03 17:08:23 Getting from cache a:last
+2011/11/03 17:08:23 Getting from cache a:1
+2011/11/03 17:08:23 Getting from cache a:last
+2011/11/03 17:08:23 Getting from cache a:1
+2011/11/03 17:08:23 Getting from cache a:last
+2011/11/03 17:08:23 Getting from cache a:1

@@ -144,6 +144,9 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 		}
     }
 	ss.sortServers()
+   for i:=0; i < len(ss.servers); i++ {
+	log.Printf("server %v", ss.servers[i])
+   }
 }
 
 // You might define here the functions that the locally-linked application
@@ -247,6 +250,10 @@ func (ss *Storageserver) GetListRPC(args *storageproto.GetArgs, reply *storagepr
 
 func (ss *Storageserver) handleModRequest(key string){
   ss.leases.lock.Lock()
+	if leaseList, present := ss.leases.data[key]; !(present && leaseList.list.Len() > 0) {
+		ss.leases.lock.Unlock()
+	 	return
+	}
 	leaseRequest := ss.leases.data[key].list
 	ss.leases.data[key].grantable = false; //deny all other lease requests
   ss.leases.data[key].list = list.New()
@@ -264,7 +271,8 @@ func (ss *Storageserver) handleModRequest(key string){
 			if (err != nil) {
 				log.Printf("Something went wrong with revoke rpc call")		
 			}else if reply.Status == storageproto.OK {
-						break;
+				log.Printf("client %v replied ok for Revoke", lease.client.NodeID)
+				break;
 			}
 		}
 	}
@@ -276,9 +284,7 @@ func (ss *Storageserver) handleModRequest(key string){
 
 
 func (ss *Storageserver) PutRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
-	if leaseList, present := ss.leases.data[args.Key]; present && leaseList.list.Len() > 0 {
-		ss.handleModRequest(args.Key)	
-	}									
+	ss.handleModRequest(args.Key)	
 	
 	status := ss.tm.PUT(args.Key, []byte(args.Value))
 	reply.Status = status
@@ -286,19 +292,14 @@ func (ss *Storageserver) PutRPC(args *storageproto.PutArgs, reply *storageproto.
 }
 
 func (ss *Storageserver) AppendToListRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
-	if leaseList, present := ss.leases.data[args.Key]; present && leaseList.list.Len() > 0 {
-		ss.handleModRequest(args.Key) 
-	}
-	
+	ss.handleModRequest(args.Key) 
 	status, err := ss.tm.AddToList(args.Key, []byte(args.Value))
 	reply.Status = status
 	return err
 }
 
 func (ss *Storageserver) RemoveFromListRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
-	if leaseList, present := ss.leases.data[args.Key]; present && leaseList.list.Len() > 0 {
-		ss.handleModRequest(args.Key) 
-	}
+	ss.handleModRequest(args.Key) 
 	 
 	status, err := ss.tm.RemoveFromList(args.Key, []byte(args.Value))
 	reply.Status = status
@@ -308,10 +309,10 @@ func (ss *Storageserver) RemoveFromListRPC(args *storageproto.PutArgs, reply *st
 func (ss *Storageserver) RevokeLeaseRPC(args *storageproto.RevokeLeaseArgs, reply *storageproto.RevokeLeaseReply) os.Error {
 	ss.cache.lock.Lock()
 	defer ss.cache.lock.Unlock()
-
 	ss.cache.cacheInfo[args.Key] = nil, false
 	
 	reply.Status = storageproto.OK
+	log.Printf("Revoking key %s", args.Key)
 	return nil
 }
 
@@ -371,6 +372,7 @@ func (ss *Storageserver) PUT(key string, val []byte) (int, os.Error) {
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeData.NodeID {
+		ss.handleModRequest(key)
 		return ss.tm.PUT(key, val), nil
 	}
 	//if not, call correct server via rpc
@@ -389,6 +391,7 @@ func (ss *Storageserver) AddToList(key string, element []byte) (int, os.Error) {
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeData.NodeID {
+		ss.handleModRequest(key)
 		return ss.tm.AddToList(key, element)
 	}
 	//if not, call correct server via rpc
@@ -408,6 +411,7 @@ func (ss *Storageserver) RemoveFromList(key string, element []byte) (int, os.Err
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeData.NodeID {
+		ss.handleModRequest(key)
 		return ss.tm.RemoveFromList(key, element)
 	}
 	//if not, call correct server via rpc
