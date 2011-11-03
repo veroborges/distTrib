@@ -250,7 +250,8 @@ func (ss *StorageServer) handleModRequest(key string){
 		//wait for OK reply or until lease expires
 		while (time.NanoSeconds() - lease.requestTime) < (LEASE_SECONDS + LEASE_GUARD_SECONDS){
 			reply := new(storageproto.RevokeLeaseReply)
-			err = master.Call("StorageRPC.RevokeLease",&storageproto.RevokeLeaseArgs{args.Key}, reply)	
+			rpcClient := ss.serversMap[lease.client.NodeID]	
+			err = rpcClient.Call("StorageRPC.RevokeLease",&storageproto.RevokeLeaseArgs{key}, reply)	
 		   		
 			if (err != nil) {
 				log.Printf("Something went wrong with revoke rpc call")		
