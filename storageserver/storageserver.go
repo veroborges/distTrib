@@ -162,10 +162,7 @@ func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *sto
 	defer ss.cond.L.Unlock()
 	reply.Ready = false
 	_, ok := ss.serversMap[args.ClientInfo.NodeID]
-	if (ok) {
-		return nil
-	}
-	if (ss.numnodes > 0) {
+	if (ss.numnodes > 0 && !ok ) {
 		log.Printf("Registration from %s", args.ClientInfo.HostPort)
 		server := &serverData{}
 		server.clientInfo = args.ClientInfo
