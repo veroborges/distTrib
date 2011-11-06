@@ -27,38 +27,38 @@ const (
 type Storageserver struct {
 	tm *storage.TribMap
 	leases *LeaseMap //stores the leases granted key -> leaselist
-	cache *CacheMap
+	cache *CacheMap // local cache
 	servers []interface{} //stores the existing storage servers
-	serversMap map[uint32] *serverData
-	numnodes int
-	nodeData storageproto.Client
-	cond *sync.Cond
-	master string
+	serversMap map[uint32] *serverData //mapping from node id to its metadata
+	numnodes int // numnodes total
+	nodeData storageproto.Client // node data of the current node
+	cond *sync.Cond // conditional variable used for syncronization after the connection is made
+	master string // the url of master
 	
 }
 
-type CacheMap struct {
-	cache *storage.TribMap
- 	cacheInfo map[string] *cacheData
-	lock sync.RWMutex
+type CacheMap struct { // The cache store
+	cache *storage.TribMap // synchronized key value store
+ 	cacheInfo map[string] *cacheData // map for storing cache meta data
+	lock sync.RWMutex // lock for cacheInfo
 }
 
-type LeaseMap struct {
-	data map[string] *LeaseList
-	lock sync.RWMutex
+type LeaseMap struct { // This structure hold lease information
+	data map[string] *LeaseList // keys that were leased out
+	lock sync.RWMutex // lock for protecting the map
 }
 
-type LeaseList struct {
-  list *list.List
-  grantable bool 
+type LeaseList struct { // for each key, we need to store, nodes that have leases
+  list *list.List // list of nodes that have leases
+  grantable bool // marks a key as not grantable if there is a modification request
 }
 
-type LeaseRequest struct {
+type LeaseRequest struct { // metadata of lease requests
 	client storageproto.Client
 	requestTime int64 
 }
 
-type cacheData struct {
+type cacheData struct { // metadate of cache data
 	leaseTime int64
 	requests *list.List
 }
@@ -68,20 +68,21 @@ type serverData struct {
 	clientInfo storageproto.Client  //info on client
 }
 
-func (c *serverData) Less(y interface{}) bool {
+func (c *serverData) Less(y interface{}) bool { // interface to sort serverData by NodeID for fast lookup
         return c.clientInfo.NodeID < y.(*serverData).clientInfo.NodeID
 }
 
-func newLeaseMap() *LeaseMap {
+func newLeaseMap() *LeaseMap { // constructor of lease map
 	lm := &LeaseMap{data:make(map[string] *LeaseList)}
 	return lm
 }
 
-func newCacheMap() *CacheMap {
+func newCacheMap() *CacheMap { // constructor of cache map
 	cm := &CacheMap{cache:storage.NewTribMap(), cacheInfo:make(map[string] *cacheData)}
 	return cm
 }
 
+// constructor of storage server
 func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *Storageserver {
 	ss := &Storageserver{storage.NewTribMap(), newLeaseMap(), newCacheMap(), 
 		nil,  make(map[uint32] *serverData), numnodes, 
@@ -89,11 +90,12 @@ func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *
 	return ss
 }
 
+// This method is used for creating connections between nodes at start up
 func (ss *Storageserver) Connect(addr net.Addr) {
 	ss.nodeData.HostPort = addr.String()
 	if (ss.numnodes == 0) {
 		log.Printf("Connecting as slave")
-		for {
+		for { // Register with the master until it's ready
 			master, err := rpc.DialHTTP("tcp", ss.master)
 			if err != nil {
 				log.Printf("Failed to connect to the master; retrying: %s", err.String())
@@ -114,7 +116,7 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 				time.Sleep(1000000000)
 			}
 		}
-	} else {
+	} else { // master case
 		ss.servers = make([]interface{}, ss.numnodes)
 		ss.servers[ss.numnodes - 1] = &serverData{nil, ss.nodeData}
 		ss.serversMap[ss.nodeData.NodeID] = ss.servers[ss.numnodes - 1].(*serverData)
@@ -123,10 +125,10 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 	ss.cond.L.Lock()
 	defer ss.cond.L.Unlock()
 	log.Printf("Connecting to other servers")
-	for ss.numnodes > 0 {
+	for ss.numnodes > 0 { //master has to wait until all other nodes have registered
 		ss.cond.Wait()
 	}
-	for i:=0; i < len(ss.servers); i++ {
+	for i:=0; i < len(ss.servers); i++ { // make rpc connection to all nodes
 		server := ss.servers[i].(*serverData)
 		if server.clientInfo.NodeID == ss.nodeData.NodeID {
 			continue
@@ -144,9 +146,6 @@ func (ss *Storageserver) Connect(addr net.Addr) {
 		}
     }
 	ss.sortServers()
-   for i:=0; i < len(ss.servers); i++ {
-	log.Printf("server %v", ss.servers[i])
-   }
 }
 
 // You might define here the functions that the locally-linked application
@@ -162,6 +161,10 @@ func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *sto
 	ss.cond.L.Lock()
 	defer ss.cond.L.Unlock()
 	reply.Ready = false
+	_, ok := ss.serversMap[args.ClientInfo.NodeID]
+	if (ok) {
+		return nil
+	}
 	if (ss.numnodes > 0) {
 		log.Printf("Registration from %s", args.ClientInfo.HostPort)
 		server := &serverData{}
@@ -182,8 +185,8 @@ func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *sto
 }
 
 func (ss *Storageserver) handleLeaseRequest(args *storageproto.GetArgs) bool {
-     ss.leases.lock.Lock()
-	 defer ss.leases.lock.Unlock()
+     	ss.leases.lock.Lock()
+	 	defer ss.leases.lock.Unlock()
 
 		if _, present := ss.leases.data[args.Key]; !present {	
 				//make new list and insert lease request
