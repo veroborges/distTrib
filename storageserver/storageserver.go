@@ -93,7 +93,7 @@ func NewStorageserver(master string, numnodes int, portnum int, nodeid uint32) *
 // This method is used for creating connections between nodes at start up
 func (ss *Storageserver) Connect(addr net.Addr) {
 	ss.nodeData.HostPort = addr.String()
-	if (ss.numnodes == 0) {
+	if (ss.numnodes == 0) { // slave logic here
 		log.Printf("Connecting as slave")
 		for { // Register with the master until it's ready
 			master, err := rpc.DialHTTP("tcp", ss.master)
@@ -161,8 +161,8 @@ func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *sto
 	ss.cond.L.Lock()
 	defer ss.cond.L.Unlock()
 	reply.Ready = false
-	_, ok := ss.serversMap[args.ClientInfo.NodeID]
-	if (ss.numnodes > 0 && !ok ) {
+	_, ok := ss.serversMap[args.ClientInfo.NodeID] //check if we have not previously registered the same node before
+	if (ss.numnodes > 0 && !ok ) { // if no register
 		log.Printf("Registration from %s", args.ClientInfo.HostPort)
 		server := &serverData{}
 		server.clientInfo = args.ClientInfo
@@ -170,41 +170,42 @@ func (ss *Storageserver) RegisterRPC(args *storageproto.RegisterArgs, reply *sto
 		ss.serversMap[server.clientInfo.NodeID] = server
 		ss.numnodes--
 	}
-	if (ss.numnodes == 0) {
+	if (ss.numnodes == 0) { // otherwise return list of servers if we heard back from required number of nodes
 		reply.Ready = true
 		reply.Clients = make([]storageproto.Client, len(ss.servers))
 		for i:=0; i < len(ss.servers); i++ {
 			reply.Clients[i] = ss.servers[i].(*serverData).clientInfo
 		}
-		ss.cond.Broadcast()
+		ss.cond.Broadcast() // wake up master thread to make connections
 	}
 	return nil
 }
 
+// This function gives out leases to nodes who want to cache a key
 func (ss *Storageserver) handleLeaseRequest(args *storageproto.GetArgs) bool {
-     	ss.leases.lock.Lock()
+     	ss.leases.lock.Lock() // lease map lock
 	 	defer ss.leases.lock.Unlock()
 
-		if _, present := ss.leases.data[args.Key]; !present {	
+		if _, present := ss.leases.data[args.Key]; !present { // if lease key is not present, create and grant request
 				//make new list and insert lease request
 				ss.leases.data[args.Key] = &LeaseList{list.New(), true}
 				ss.leases.data[args.Key].list.PushBack(&LeaseRequest{args.LeaseClient, time.Nanoseconds()})	
 				
 				return true
 
-		}else if ss.leases.data[args.Key].grantable == true{	
+		}else if ss.leases.data[args.Key].grantable == true{ // if least key is present and it's grantable, grant the request	
 				ss.leases.data[args.Key].list.PushBack(&LeaseRequest{args.LeaseClient, time.Nanoseconds()})	
 	  		
 				return true
 	 	}
-		return false				  
+		return false // ungrantable key, deny the lease			  
 }
 
 func (ss *Storageserver) GetRPC(args *storageproto.GetArgs, reply *storageproto.GetReply) os.Error {
 	reply.Lease = storageproto.LeaseStruct{}
 	reply.Lease.Granted = false
 	reply.Lease.ValidSeconds = 0
-	if args.WantLease && ss.handleLeaseRequest(args) {
+	if args.WantLease && ss.handleLeaseRequest(args) { // grant the lease if possible
 		reply.Lease.Granted = true
 		reply.Lease.ValidSeconds = LEASE_SECONDS
     }
@@ -224,7 +225,7 @@ func (ss *Storageserver) GetListRPC(args *storageproto.GetArgs, reply *storagepr
 	 
 	reply.Lease.Granted = false
 	reply.Lease.ValidSeconds = 0
-	if args.WantLease && ss.handleLeaseRequest(args) {
+	if args.WantLease && ss.handleLeaseRequest(args) { // grant the lease if possible
 		reply.Lease.Granted = true
 		reply.Lease.ValidSeconds = LEASE_SECONDS
     }
@@ -248,16 +249,17 @@ func (ss *Storageserver) GetListRPC(args *storageproto.GetArgs, reply *storagepr
 	return nil
 }
 
-func (ss *Storageserver) handleModRequest(key string){
-  ss.leases.lock.Lock()
-	if leaseList, present := ss.leases.data[key]; !(present && leaseList.list.Len() > 0) {
+func (ss *Storageserver) handleModRequest(key string){ // handle leased key modifications
+  	ss.leases.lock.Lock() // obtain lock on lease data structure
+	if leaseList, present := ss.leases.data[key]; !(present && leaseList.list.Len() > 0) { // the key is not leased out return
 		ss.leases.lock.Unlock()
 	 	return
 	}
-	leaseRequest := ss.leases.data[key].list
+	// the key is leased, mark it as ungrantable, copy list of leasers and release the lock to allow other leases to continue
+ 	leaseRequest := ss.leases.data[key].list
 	ss.leases.data[key].grantable = false; //deny all other lease requests
-  ss.leases.data[key].list = list.New()
-  ss.leases.lock.Unlock()
+  	ss.leases.data[key].list = list.New()
+  	ss.leases.lock.Unlock()
 
 	//call RevokeLeaseReply to all lease holders
 	for leaseElement := leaseRequest.Front(); leaseElement != nil; leaseElement = leaseElement.Next() {
@@ -277,14 +279,14 @@ func (ss *Storageserver) handleModRequest(key string){
 		}
 	}
 
-  ss.leases.lock.Lock()
+  	ss.leases.lock.Lock() // mark the lease key as grantable again
 	ss.leases.data[key].grantable = true 
-  ss.leases.lock.Unlock()
+  	ss.leases.lock.Unlock()
 }
 
 
 func (ss *Storageserver) PutRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
-	ss.handleModRequest(args.Key)	
+	ss.handleModRequest(args.Key) // revoke leases	
 	
 	status := ss.tm.PUT(args.Key, []byte(args.Value))
 	reply.Status = status
@@ -292,14 +294,14 @@ func (ss *Storageserver) PutRPC(args *storageproto.PutArgs, reply *storageproto.
 }
 
 func (ss *Storageserver) AppendToListRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
-	ss.handleModRequest(args.Key) 
+	ss.handleModRequest(args.Key) // revoke leases
 	status, err := ss.tm.AddToList(args.Key, []byte(args.Value))
 	reply.Status = status
 	return err
 }
 
 func (ss *Storageserver) RemoveFromListRPC(args *storageproto.PutArgs, reply *storageproto.PutReply) os.Error {
-	ss.handleModRequest(args.Key) 
+	ss.handleModRequest(args.Key) // revoke leases
 	 
 	status, err := ss.tm.RemoveFromList(args.Key, []byte(args.Value))
 	reply.Status = status
@@ -309,7 +311,7 @@ func (ss *Storageserver) RemoveFromListRPC(args *storageproto.PutArgs, reply *st
 func (ss *Storageserver) RevokeLeaseRPC(args *storageproto.RevokeLeaseArgs, reply *storageproto.RevokeLeaseReply) os.Error {
 	ss.cache.lock.Lock()
 	defer ss.cache.lock.Unlock()
-	ss.cache.cacheInfo[args.Key] = nil, false
+	ss.cache.cacheInfo[args.Key] = nil, false // remove the key from cache info indicating that cache key is invalid
 	
 	reply.Status = storageproto.OK
 	log.Printf("Revoking key %s", args.Key)
@@ -328,16 +330,16 @@ func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
 	ss.cache.lock.Lock()
 	defer ss.cache.lock.Unlock()
 	
-	data, ok := ss.cache.cacheInfo[key]
+	data, ok := ss.cache.cacheInfo[key] // create cache info for the given remote key
 	if !ok {
 		data = &cacheData{0, list.New()}
 		ss.cache.cacheInfo[key] = data
 	}
-	data.requests.PushBack(time.Nanoseconds())
-	if data.requests.Len() > QUERY_COUNT_THRESH {
+	data.requests.PushBack(time.Nanoseconds()) // add request time to the linked list of request times
+	if data.requests.Len() > QUERY_COUNT_THRESH { // only keep track of last QUERY_COUNT_THRESH requests, by removing old ones
 		data.requests.Remove(data.requests.Front())
 	}
-	if (data.leaseTime - time.Nanoseconds() > 0) {
+	if (data.leaseTime - time.Nanoseconds() > 0) { // if a key is in cache and it's valid, get it from the cache
 		log.Printf("Getting from cache %s", key);
 		res, stat := ss.cache.cache.GET(key)
 		return res, stat, nil
@@ -346,7 +348,7 @@ func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
 	var requestLease bool = false
 	if (data.requests.Len() >= QUERY_COUNT_THRESH && data.requests.Back().Value.(int64) - data.requests.Front().Value.(int64) <= QUERY_COUNT_SECONDS * 1000000000) {
 		requestLease = true
-		log.Printf("Requesting lease for %s", key)
+		log.Printf("Requesting lease for %s", key) // request a lease if more than QUERY_COUNT_THRESH requests were made within QUERY_COUNT_SECONDS
 	}
 	
 	log.Printf("Getting from %s", serv.clientInfo.HostPort)
@@ -357,7 +359,7 @@ func (ss *Storageserver) GET(key string) ([]byte, int, os.Error) {
 	if (err != nil) {
 		return nil, 0, err
 	}
-	if (reply.Lease.Granted) {
+	if (reply.Lease.Granted) { // we lease was grandted,stick it into the cache
 		data.leaseTime = time.Nanoseconds() + int64(reply.Lease.ValidSeconds * 1000000000)
 		ss.cache.cache.PUT(key, []byte(reply.Value))
 		log.Printf("Adding to cache %s", key)
@@ -372,7 +374,7 @@ func (ss *Storageserver) PUT(key string, val []byte) (int, os.Error) {
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeData.NodeID {
-		ss.handleModRequest(key)
+		ss.handleModRequest(key) // revoke leases
 		return ss.tm.PUT(key, val), nil
 	}
 	//if not, call correct server via rpc
@@ -391,7 +393,7 @@ func (ss *Storageserver) AddToList(key string, element []byte) (int, os.Error) {
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeData.NodeID {
-		ss.handleModRequest(key)
+		ss.handleModRequest(key) // revoke leases
 		return ss.tm.AddToList(key, element)
 	}
 	//if not, call correct server via rpc
@@ -411,7 +413,7 @@ func (ss *Storageserver) RemoveFromList(key string, element []byte) (int, os.Err
 
 	//if local server call server tribmap
 	if serv.clientInfo.NodeID == ss.nodeData.NodeID {
-		ss.handleModRequest(key)
+		ss.handleModRequest(key) // revoke leases
 		return ss.tm.RemoveFromList(key, element)
 	}
 	//if not, call correct server via rpc
@@ -443,6 +445,7 @@ func (ss *Storageserver) GetIndex(key string) (int) {
 	return pos  % len(ss.servers)
 }
 
+// little helper function for sorting servers
 func (ss *Storageserver) sortServers() {
 	v := vector.Vector(ss.servers)
 	sort.Sort(&v)
